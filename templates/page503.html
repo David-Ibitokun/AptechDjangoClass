@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div style="margin: 0; font-family: Arial, sans-serif; background-color: #f4f4f4; display: flex; align-items: center; justify-content: center; height: 100vh; text-align: center;">
+
+  <div style="background-color: #fff; padding: 40px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.1); max-width: 600px;">
+
+    <h1 style="font-size: 4rem; color: #f39c12; margin-bottom: 10px;">503</h1>
+    <h2 style="font-size: 1.8rem; color: #2c3e50;">Service Unavailable</h2>
+    <p style="color: #555; font-size: 1rem; margin-top: 15px;">
+      We're currently undergoing maintenance or facing high traffic.<br>
+      Please check back in a few minutes.
+    </p>
+
+    <a href="/" style="display: inline-block; margin-top: 25px; padding: 12px 25px; background-color: #e67e22; color: white; text-decoration: none; font-size: 1rem; border-radius: 5px;">
+      Back to Home
+    </a>
+  </div>
+
+</div>
+
+{% endblock %}

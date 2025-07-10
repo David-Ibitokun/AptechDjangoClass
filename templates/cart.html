@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+  <!-- Header Section -->
+  <header style="background-color: #222; padding: 20px; text-align: center; color: white;">
+    <h1 style="color: white;">Your Shopping Cart</h1>
+  </header>
+
+  <!-- Cart Section -->
+  <main style="max-width: 800px; margin: auto; padding: 40px 20px;">
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="background-color: #f8f8f8;">
+          <th style="padding: 10px; text-align: left;">Product</th>
+          <th style="padding: 10px; text-align: left;">Price</th>
+          <th style="padding: 10px; text-align: left;">Quantity</th>
+          <th style="padding: 10px; text-align: left;">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Cart Item 1 -->
+        <tr>
+          <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+            <img src="https://ng.jumia.is/unsafe/fit-in/300x300/filters:fill(white)/product/65/6880714/1.jpg?5300" alt="Product 1" style="width: 50px; height: auto; border-radius: 4px; margin-right: 10px;">
+            Product 1
+          </td>
+          <td style="padding: 10px; border-bottom: 1px solid #ddd;">$49.99</td>
+          <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+            <input type="number" value="1" min="1" style="width: 50px; padding: 5px; border-radius: 4px; border: 1px solid #ccc;">
+          </td>
+          <td style="padding: 10px; border-bottom: 1px solid #ddd;">$49.99</td>
+        </tr>
+
+        <!-- Cart Item 2 -->
+        <tr>
+          <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+            <img src="https://ng.jumia.is/unsafe/fit-in/300x300/filters:fill(white)/product/32/2591114/1.jpg?8806" alt="Product 2" style="width: 50px; height: auto; border-radius: 4px; margin-right: 10px;">
+            Product 2
+          </td>
+          <td style="padding: 10px; border-bottom: 1px solid #ddd;">$69.99</td>
+          <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+            <input type="number" value="1" min="1" style="width: 50px; padding: 5px; border-radius: 4px; border: 1px solid #ccc;">
+          </td>
+          <td style="padding: 10px; border-bottom: 1px solid #ddd;">$69.99</td>
+        </tr>
+
+        <!-- Cart Item 3 -->
+        <tr>
+          <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+            <img src="https://ng.jumia.is/unsafe/fit-in/300x300/filters:fill(white)/product/45/3309113/1.jpg?5109" alt="Product 3" style="width: 50px; height: auto; border-radius: 4px; margin-right: 10px;">
+            Product 3
+          </td>
+          <td style="padding: 10px; border-bottom: 1px solid #ddd;">$89.99</td>
+          <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+            <input type="number" value="1" min="1" style="width: 50px; padding: 5px; border-radius: 4px; border: 1px solid #ccc;">
+          </td>
+          <td style="padding: 10px; border-bottom: 1px solid #ddd;">$89.99</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Cart Summary -->
+    <div style="margin-top: 20px; text-align: right;">
+      <h3 style="color: #2c3e50;">Subtotal: $209.97</h3>
+      <button style="background-color: #e67e22; color: white; border: none; padding: 15px 30px; font-size: 1.2rem; cursor: pointer; border-radius: 5px; transition: background-color 0.3s;">
+        Proceed to Checkout
+      </button>
+    </div>
+  </main>
+
+</body>
+</html>
+
+{% endblock %}

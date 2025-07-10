@@ -1,0 +1,47 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg border-0 rounded-4">
+          <div class="card-body p-5">
+            <h3 class="text-center mb-4 text-primary fw-bold">Login to Your Account</h3>
+
+            {% if messages %}
+              {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+              {% endfor %}
+            {% endif %}
+
+            <form method="POST" novalidate>
+              {% csrf_token %}
+              <div class="mb-3">
+                <label class="form-label fw-semibold">{{ form.username.label }}</label>
+                {{ form.username }}
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">{{ form.password.label }}</label>
+                {{ form.password }}
+              </div>
+
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary py-2 fs-5 rounded-pill">Login</button>
+              </div>
+            </form>
+
+            <p class="text-center mt-4 text-muted">
+              Don't have an account?
+              <a href="{% url 'register' %}" class="text-decoration-none">Register here</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

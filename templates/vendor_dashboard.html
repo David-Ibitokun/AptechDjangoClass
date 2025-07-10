@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-4">
+      <h2 class="fw-bold text-primary">Vendor Dashboard</h2>
+      <p class="text-muted">Hello, {{ request.user.first_name }}! Manage your products and orders below.</p>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Store Overview</h5>
+        <p class="card-text">View your product listings, orders, and sales insights.</p>
+      </div>
+    </div>
+
+    <div class="row mb-4">
+      <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0 d-flex flex-column h-100">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">Manage Products</h5>
+            <p class="card-text">Add, edit, or remove your products from the store.</p>
+            <a href="#" class="btn btn-primary mt-auto">Manage Products</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0 d-flex flex-column h-100">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">View Orders</h5>
+            <p class="card-text">Check the status of your orders and manage them.</p>
+            <a href="#" class="btn btn-primary mt-auto">View Orders</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0 d-flex flex-column h-100">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">Sales Insights</h5>
+            <p class="card-text">Analyze your sales performance and trends.</p>
+            <a href="#" class="btn btn-primary mt-auto">View Insights</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mt-4">
+      <div class="card-body">
+        <h5 class="card-title">Notifications</h5>
+        <ul class="list-group">
+          <li class="list-group-item">You have 2 new orders to process.</li>
+          <li class="list-group-item">Your product listing has been approved.</li>
+          <li class="list-group-item">Don't forget to check your inventory levels!</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

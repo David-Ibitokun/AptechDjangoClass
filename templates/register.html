@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-7 col-lg-6">
+        <div class="card shadow-lg border-0 rounded-4">
+          <div class="card-body p-5">
+            <h3 class="card-title text-center mb-4 text-primary fw-bold">Create Your Account</h3>
+
+            <!-- ✅ Django Messages -->
+            {% if messages %}
+              {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+
+            <!-- ✅ Non-field Errors -->
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ form.non_field_errors }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endif %}
+
+            <form method="POST" novalidate>
+              {% csrf_token %}
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">{{ form.username.label }}</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                  <div class="alert alert-danger mt-1" role="alert">
+                    {{ form.username.errors|striptags }}
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">{{ form.first_name.label }}</label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}
+                  <div class="alert alert-danger mt-1" role="alert">
+                    {{ form.first_name.errors|striptags }}
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">{{ form.last_name.label }}</label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}
+                  <div class="alert alert-danger mt-1" role="alert">
+                    {{ form.last_name.errors|striptags }}
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">{{ form.email.label }}</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                  <div class="alert alert-danger mt-1" role="alert">
+                    {{ form.email.errors|striptags }}
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">{{ form.account_type.label }}</label>
+                {{ form.account_type }}
+                {% if form.account_type.errors %}
+                  <div class="alert alert-danger mt-1" role="alert">
+                    {{ form.account_type.errors|striptags }}
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">{{ form.password1.label }}</label>
+                {{ form.password1 }}
+                {% if form.password1.errors %}
+                  <div class="alert alert-danger mt-1" role="alert">
+                    {{ form.password1.errors|striptags }}
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">{{ form.password2.label }}</label>
+                {{ form.password2 }}
+                {% if form.password2.errors %}
+                  <div class="alert alert-danger mt-1" role="alert">
+                    {{ form.password2.errors|striptags }}
+                  </div>
+                {% endif %}
+              </div>
+
+              <!-- ✅ Checkbox: Agreed to Terms -->
+              <div class="form-check mb-4">
+                {{ form.agreed_to_terms }}
+                <label class="form-check-label ms-2">{{ form.agreed_to_terms.label }}</label>
+                {% if form.agreed_to_terms.errors %}
+                  <div class="alert alert-danger mt-1" role="alert">
+                    {{ form.agreed_to_terms.errors|striptags }}
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary py-2 fs-5 rounded-pill shadow-sm">
+                  Register
+                </button>
+              </div>
+            </form>
+
+            <p class="text-center mt-4 mb-0 text-muted">
+              Already have an account?
+              <a href="{% url 'login' %}" class="text-decoration-none fw-medium">Login here</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  setTimeout(() => {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+      alert.classList.remove('show');
+      alert.classList.add('fade');
+    });
+  }, 5000);
+</script>
+{% endblock %}
