@@ -1,15 +1,28 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login
+from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
-from .forms import UsersRegistrationForm
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required
+
+from .forms import UsersRegistrationForm # Import your custom registration form
+# Assuming 'pages' is another app and Product is defined there
+from pages.models import Product # Ensure this import path is correct for your project structure
+
 
 def register_user(request):
+    """
+    Handles user registration.
+    - If POST request, attempts to validate and save the new user.
+    - If GET request, displays an empty registration form.
+    """
     if request.method == 'POST':
         form = UsersRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            messages.success(request, "Registration successful. Please log in.")
-            return redirect('login')
+            # Optionally, log in the user immediately after registration
+            # login(request, user) # Uncomment if you want to auto-login
+            messages.success(request, "Registration successful. You can now log in.")
+            return redirect('login') # Redirect to the login page
         else:
             messages.error(request, "Please correct the errors below.")
     else:
@@ -18,16 +31,18 @@ def register_user(request):
     return render(request, 'register.html', {'form': form})
 
 
-
-
-from django.contrib.auth import authenticate, login
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .forms import UsersRegistrationForm
-from django.contrib.auth.forms import AuthenticationForm
-
-
 def login_user(request):
+    """
+    Handles user login.
+    - If POST request, attempts to authenticate the user.
+    - If GET request, displays the login form.
+    """
+    if request.user.is_authenticated: # If already logged in, redirect to dashboard
+        if request.user.account_type == 'vendor':
+            return redirect('vendor_dashboard')
+        else:
+            return redirect('user_dashboard')
+
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -47,37 +62,44 @@ def login_user(request):
             else:
                 messages.error(request, "Invalid username or password.")
         else:
-            messages.error(request, "Invalid credentials.")
+            # This message is shown if the form itself is not valid (e.g., empty fields)
+            messages.error(request, "Please enter your username and password.")
     else:
         form = AuthenticationForm()
 
     return render(request, 'login.html', {'form': form})
 
 
-
-from django.contrib.auth import logout
-from django.contrib import messages
-
 def logout_user(request):
+    """
+    Logs out the current user and redirects to the login page.
+    """
     logout(request)
     messages.success(request, "You have been logged out successfully.")
-    return redirect('login') 
+    return redirect('login')
 
-
-
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from pages.models import Product
 
 @login_required
 def user_dashboard(request):
+    """
+    Displays the user dashboard. Requires login.
+    Redirects to vendor dashboard if the user is a vendor.
+    """
     if request.user.account_type != 'user':
-        return redirect('vendor_dashboard')  # Redirect if vendor tries to access user dashboard
+        messages.warning(request, "You do not have permission to view this page.")
+        return redirect('vendor_dashboard')
     return render(request, 'user_dashboard.html')
+
 
 @login_required
 def vendor_dashboard(request):
-    products = Product.objects.filter(creator=request.user)
+    """
+    Displays the vendor dashboard and lists products created by the vendor. Requires login.
+    Redirects to user dashboard if the user is a regular user.
+    """
     if request.user.account_type != 'vendor':
-        return redirect('user_dashboard')  # Redirect if user tries to access vendor dashboard
+        messages.warning(request, "You do not have permission to view this page.")
+        return redirect('user_dashboard')
+
+    products = Product.objects.filter(creator=request.user)
     return render(request, 'vendor_dashboard.html', {'products': products})

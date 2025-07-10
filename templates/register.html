@@ -10,20 +10,22 @@
           <div class="card-body p-5">
             <h3 class="card-title text-center mb-4 text-primary fw-bold">Create Your Account</h3>
 
-            <!-- ✅ Django Messages -->
             {% if messages %}
+              <div class="mb-3">
               {% for message in messages %}
                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
                   {{ message }}
                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
               {% endfor %}
+              </div>
             {% endif %}
 
-            <!-- ✅ Non-field Errors -->
             {% if form.non_field_errors %}
-              <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ form.non_field_errors }}
+              <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                {% for error in form.non_field_errors %}
+                  <div>{{ error }}</div>
+                {% endfor %}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
               </div>
             {% endif %}
@@ -31,86 +33,41 @@
             <form method="POST" novalidate>
               {% csrf_token %}
 
-              <div class="mb-3">
-                <label class="form-label fw-semibold">{{ form.username.label }}</label>
-                {{ form.username }}
-                {% if form.username.errors %}
-                  <div class="alert alert-danger mt-1" role="alert">
-                    {{ form.username.errors|striptags }}
+              {% for field in form %}
+                {% if field.name == 'agreed_to_terms' %}
+                  <div class="form-check mb-4">
+                    {{ field }} {# This renders the checkbox input #}
+                    <label class="form-check-label" for="{{ field.id_for_label }}">
+                      {{ field.label }}
+                    </label>
+                    {% if field.help_text %}
+                      <div class="form-text text-muted">{{ field.help_text }}</div>
+                    {% endif %}
+                    {% if field.errors %}
+                      <div class="invalid-feedback d-block">
+                        {% for error in field.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
+                {% else %}
+                  <div class="mb-3">
+                    <label for="{{ field.id_for_label }}" class="form-label fw-semibold">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                      <div class="form-text text-muted">{{ field.help_text }}</div>
+                    {% endif %}
+                    {% if field.errors %}
+                      <div class="invalid-feedback d-block">
+                        {% for error in field.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </div>
+                    {% endif %}
                   </div>
                 {% endif %}
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label fw-semibold">{{ form.first_name.label }}</label>
-                {{ form.first_name }}
-                {% if form.first_name.errors %}
-                  <div class="alert alert-danger mt-1" role="alert">
-                    {{ form.first_name.errors|striptags }}
-                  </div>
-                {% endif %}
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label fw-semibold">{{ form.last_name.label }}</label>
-                {{ form.last_name }}
-                {% if form.last_name.errors %}
-                  <div class="alert alert-danger mt-1" role="alert">
-                    {{ form.last_name.errors|striptags }}
-                  </div>
-                {% endif %}
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label fw-semibold">{{ form.email.label }}</label>
-                {{ form.email }}
-                {% if form.email.errors %}
-                  <div class="alert alert-danger mt-1" role="alert">
-                    {{ form.email.errors|striptags }}
-                  </div>
-                {% endif %}
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label fw-semibold">{{ form.account_type.label }}</label>
-                {{ form.account_type }}
-                {% if form.account_type.errors %}
-                  <div class="alert alert-danger mt-1" role="alert">
-                    {{ form.account_type.errors|striptags }}
-                  </div>
-                {% endif %}
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label fw-semibold">{{ form.password1.label }}</label>
-                {{ form.password1 }}
-                {% if form.password1.errors %}
-                  <div class="alert alert-danger mt-1" role="alert">
-                    {{ form.password1.errors|striptags }}
-                  </div>
-                {% endif %}
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label fw-semibold">{{ form.password2.label }}</label>
-                {{ form.password2 }}
-                {% if form.password2.errors %}
-                  <div class="alert alert-danger mt-1" role="alert">
-                    {{ form.password2.errors|striptags }}
-                  </div>
-                {% endif %}
-              </div>
-
-              <!-- ✅ Checkbox: Agreed to Terms -->
-              <div class="form-check mb-4">
-                {{ form.agreed_to_terms }}
-                <label class="form-check-label ms-2">{{ form.agreed_to_terms.label }}</label>
-                {% if form.agreed_to_terms.errors %}
-                  <div class="alert alert-danger mt-1" role="alert">
-                    {{ form.agreed_to_terms.errors|striptags }}
-                  </div>
-                {% endif %}
-              </div>
+              {% endfor %}
 
               <div class="d-grid">
                 <button type="submit" class="btn btn-primary py-2 fs-5 rounded-pill shadow-sm">
@@ -131,12 +88,17 @@
 </section>
 
 <script>
-  setTimeout(() => {
+  // Fade out Django messages after 5 seconds
+  document.addEventListener('DOMContentLoaded', () => {
     const alerts = document.querySelectorAll('.alert');
     alerts.forEach(alert => {
-      alert.classList.remove('show');
-      alert.classList.add('fade');
+      setTimeout(() => {
+        alert.classList.remove('show');
+        alert.classList.add('fade');
+        // Optionally remove the alert from the DOM after fading out
+        alert.addEventListener('transitionend', () => alert.remove());
+      }, 5000);
     });
-  }, 5000);
+  });
 </script>
 {% endblock %}

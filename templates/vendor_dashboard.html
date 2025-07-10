@@ -7,53 +7,40 @@
       <p class="text-muted">Hello, {{ request.user.first_name }}! Manage your products and orders below.</p>
     </div>
 
-    <div class="card shadow-sm border-0 mb-4">
-      <div class="card-body">
-        <h5 class="card-title">Store Overview</h5>
-        <p class="card-text">View your product listings, orders, and sales insights.</p>
-      </div>
+    <!-- Navigation Buttons -->
+    <div class="mb-4 text-center">
+      <a href="{% url 'add_product' %}" class="btn btn-primary me-2">Add New Product</a>
+      <a href="{% url 'product_list' %}" class="btn btn-outline-secondary me-2">View My Products</a>
     </div>
 
-    <div class="row mb-4">
-      <div class="col-md-4 mb-4">
-        <div class="card shadow-sm border-0 d-flex flex-column h-100">
-          <div class="card-body d-flex flex-column">
-            <h5 class="card-title">Manage Products</h5>
-            <p class="card-text">Add, edit, or remove your products from the store.</p>
-            <a href="#" class="btn btn-primary mt-auto">Manage Products</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-4 mb-4">
-        <div class="card shadow-sm border-0 d-flex flex-column h-100">
-          <div class="card-body d-flex flex-column">
-            <h5 class="card-title">View Orders</h5>
-            <p class="card-text">Check the status of your orders and manage them.</p>
-            <a href="#" class="btn btn-primary mt-auto">View Orders</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-4 mb-4">
-        <div class="card shadow-sm border-0 d-flex flex-column h-100">
-          <div class="card-body d-flex flex-column">
-            <h5 class="card-title">Sales Insights</h5>
-            <p class="card-text">Analyze your sales performance and trends.</p>
-            <a href="#" class="btn btn-primary mt-auto">View Insights</a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card shadow-sm border-0 mt-4">
+    <!-- Product List Section -->
+    <div class="card shadow-sm border-0">
       <div class="card-body">
-        <h5 class="card-title">Notifications</h5>
-        <ul class="list-group">
-          <li class="list-group-item">You have 2 new orders to process.</li>
-          <li class="list-group-item">Your product listing has been approved.</li>
-          <li class="list-group-item">Don't forget to check your inventory levels!</li>
-        </ul>
+        <h5 class="card-title mb-3">My Products</h5>
+
+        {% if products %}
+          <div class="row">
+            {% for product in products %}
+              <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                  {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                  {% endif %}
+                  <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text">{{ product.description|truncatewords:15 }}</p>
+                    <p class="text-muted">₦{{ product.get_display_price }}</p>
+                    <p class="badge bg-{{ product.is_in_stock|yesno:'success,danger' }}">
+                      {{ product.is_in_stock|yesno:'In Stock,Out of Stock' }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted">You haven't added any products yet.</p>
+        {% endif %}
       </div>
     </div>
   </div>
