@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="card">
+    <div class="card-header bg-primary text-white">Add New Product</div>
+    <div class="card-body">
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="mb-3">
+          <label class="form-label">{{ form.name.label }}</label>
+          {{ form.name }}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">{{ form.description.label }}</label>
+          {{ form.description }}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">{{ form.price.label }}</label>
+          {{ form.price }}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">{{ form.discount_price.label }}</label>
+          {{ form.discount_price }}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">{{ form.category.label }}</label>
+          {{ form.category }}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">{{ form.tags.label }}</label>
+          {{ form.tags }}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">{{ form.image.label }}</label>
+          {{ form.image }}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">{{ form.stock_quantity.label }}</label>
+          {{ form.stock_quantity }}
+        </div>
+
+        <div class="form-check mb-3">
+          {{ form.is_available }}
+          <label class="form-check-label ms-2">{{ form.is_available.label }}</label>
+        </div>
+
+        <div class="d-grid">
+          <button type="submit" class="btn btn-success">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
