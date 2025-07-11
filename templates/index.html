@@ -334,12 +334,13 @@
           <div class="tab-content" id="nav-tabContent">
             <div class="tab-pane fade show active" id="nav-all" role="tabpanel" aria-labelledby="nav-all-tab">
 
-              <div class="product-grid row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5">
+              <div class="product-grid row ">
+                <!-- row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 -->
                 {% for product in products %}
                 <div class="col">
                   <div class="product-item">
                     {% if product.discount_price %}
-                    <span class="badge bg-success position-absolute m-3">
+                    <span class="badge position-absolute m-3" style="background-color: red;">
                       -{{ product.get_discount_percent }}%
                     </span>
                     {% endif %}
@@ -395,10 +396,9 @@
                   <p>No products available.</p>
                 </div>
                 {% endfor %}
-              </div>
 
               <!-- / product-grid -->
-
+              </div>
             </div>
 
             <div class="tab-pane fade" id="nav-fruits" role="tabpanel" aria-labelledby="nav-fruits-tab">

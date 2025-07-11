@@ -37,7 +37,12 @@ class Product(models.Model):
         return f'{self.name}'
 
     def get_display_price(self):
-        return self.discount_price if self.discount_price else self.price
+        return f"{self.discount_price:,.2f}" if self.discount_price else self.price
+    
+    def get_discount_percent(self):
+        # discount/100 * actual price
+        percentage = ((self.price - self.discount_price) / self.price) * 100
+        return f"{percentage:.2f}"
 
     def is_in_stock(self):
         return self.stock_quantity > 0

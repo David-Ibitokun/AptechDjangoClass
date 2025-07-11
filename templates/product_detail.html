@@ -18,7 +18,7 @@
       
       <div class="my-3">
         {% if product.discount_price %}
-          <span class="text-danger h4 me-2">${{ product.discount_price }}</span>
+          <span style="color: red;" class="h4 me-2">${{ product.discount_price }}</span>
           <del class="text-muted">${{ product.price }}</del>
         {% else %}
           <span class="h4">${{ product.price }}</span>
