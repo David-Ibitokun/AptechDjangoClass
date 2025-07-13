@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+  <div class="container mt-5">
+    <h2 class="text-primary mb-4 text-center">Products by "{{ brand.name }}"</h2>
+
+    {% if products %}
+      <div class="list-group shadow-sm rounded">
+{% for product in products %}
+<a href="{% url 'product_detail' product.slug %}" class="list-group-item list-group-item-action d-flex align-items-center">
+{% if product.image %}
+<img src="{{ product.image.url }}" alt="{{ product.name }}" class="me-3 rounded" style="width: 60px; height: 60px; object-fit: cover;">
+{% else %}
+<img src="{% static 'images/no-image.png' %}" alt="No Image" class="me-3 rounded" style="width: 60px; height: 60px; object-fit: cover;">
+{% endif %}
+<strong>{{ product.name }}</strong>
+</a>
+{% endfor %}
+      </div>
+    {% else %}
+      <div class="alert alert-warning text-center" role="alert">
+        No products found for this brand.
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

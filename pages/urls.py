@@ -1,6 +1,6 @@
 
 from django.urls import path
-from .views import home,about,shop,singleProduct,cart,myAccount,page404, login, register, myProfile, wishList, page500, add_product, product_list, product_detail, page503
+from .views import home,about,shop,singleProduct,cart,myAccount,page404, login, register, myProfile, wishList, page500, add_product, product_list, product_detail, brand_detail, brand_list, page503
 
 urlpatterns = [
     path('', home, name='home'),
@@ -19,4 +19,12 @@ urlpatterns = [
     path('product/add/', add_product, name='add_product'),
     path('product/list/', product_list, name='product_list'),
     path('product/<slug:slug>/', product_detail, name='product_detail'),
+    path('brands/', brand_list, name='brand_list'),
+    path('brands/<int:brand_id>/', brand_detail, name='brand_detail'),
+    # path('wishlist/add/<int:product_id>/', add_to_wishlist, name='add_to_wishlist'),
+    # path('wishlist/', wishlist_view, name='wishlist'),
+    # path('wishlist/remove/<int:product_id>/', remove_from_wishlist, name='remove_from_wishlist'),
+
+    # path('brands/int:brand_id/', brand_detail, name='brand_detail'),
 ]
+

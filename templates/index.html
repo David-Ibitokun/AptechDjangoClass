@@ -334,71 +334,132 @@
           <div class="tab-content" id="nav-tabContent">
             <div class="tab-pane fade show active" id="nav-all" role="tabpanel" aria-labelledby="nav-all-tab">
 
-              <div class="product-grid row ">
-                <!-- row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 -->
-                {% for product in products %}
-                <div class="col">
-                  <div class="product-item">
-                    {% if product.discount_price %}
-                    <span class="badge position-absolute m-3" style="background-color: red;">
-                      -{{ product.get_discount_percent }}%
-                    </span>
-                    {% endif %}
-                    <a href="#" class="btn-wishlist">
-                      <svg width="24" height="24">
-                        <use xlink:href="#heart"></use>
-                      </svg>
-                    </a>
-                    <figure>
-                      <a href="{% url 'product_detail' product.slug %}" title="{{ product.name }}">
-                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="tab-image">
-                      </a>
-                    </figure>
-                    <h3>{{ product.name }}</h3>
-                    <span class="qty">{{ product.stock_quantity }} in stock</span>
-                    <span class="rating">
-                      <svg width="24" height="24" class="text-primary">
-                        <use xlink:href="#star-solid"></use>
-                      </svg> 4.5
-                    </span>
-                    <span class="price">
-                      {% if product.discount_price %}
-                      <del>${{ product.price }}</del> ${{ product.discount_price }}
-                      {% else %}
-                      ${{ product.price }}
-                      {% endif %}
-                    </span>
-                    <div class="d-flex align-items-center justify-content-between">
-                      <div class="input-group product-qty">
-                        <span class="input-group-btn">
-                          <button type="button" class="quantity-left-minus btn btn-danger btn-number" data-type="minus">
-                            <svg width="16" height="16">
-                              <use xlink:href="#minus"></use>
-                            </svg>
-                          </button>
-                        </span>
-                        <input type="text" name="quantity" class="form-control input-number" value="1">
-                        <span class="input-group-btn">
-                          <button type="button" class="quantity-right-plus btn btn-success btn-number" data-type="plus">
-                            <svg width="16" height="16">
-                              <use xlink:href="#plus"></use>
-                            </svg>
-                          </button>
-                        </span>
-                      </div>
-                      <a href="#" class="nav-link">Add to Cart <iconify-icon
-                          icon="uil:shopping-cart"></iconify-icon></a>
-                    </div>
-                  </div>
-                </div>
-                {% empty %}
-                <div class="col">
-                  <p>No products available.</p>
-                </div>
-                {% endfor %}
+  <!-- <div class="product-grid row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+  {% for product in products %}
+  <div class="col">
+    <div class="card h-100 shadow-sm position-relative">
+      {% if product.discount_price %}
+      <span style="background-color: red;" class="badge position-absolute top-0 start-0 m-3">
+        -{{ product.get_discount_percent }}%
+      </span>
+      {% endif %}
+      <a href="#" class="btn btn-outline-danger btn-sm position-absolute top-0 end-0 m-3" aria-label="Add to wishlist">
+        <svg width="20" height="20" fill="currentColor">
+          <use xlink:href="#heart"></use>
+        </svg>
+      </a>
+      <a href="{% url 'product_detail' product.slug %}" title="{{ product.name }}">
+        {% if product.image %}
+        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="object-fit: cover; height: 200px;">
+        {% else %}
+        <img src="{% static 'images/no-image.png' %}" class="card-img-top" alt="No Image" style="object-fit: cover; height: 200px;">
+        {% endif %}
+      </a>
+      <div class="card-body d-flex flex-column">
+        <h5 class="card-title">{{ product.name }}</h5>
+        <p class="card-text mb-1 text-muted">{{ product.stock_quantity }} in stock</p>
+        <div class="mb-2">
+          <span class="text-primary me-2">
+            <svg width="16" height="16" fill="currentColor" class="bi bi-star-fill">
+              <use xlink:href="#star-solid"></use>
+            </svg> 4.5
+          </span>
+        </div>
+        <div class="mb-3 fs-5">
+          {% if product.discount_price %}
+          <span class="text-muted text-decoration-line-through">${{ product.price }}</span>
+          <span style="color: red;"  class="fw-bold ms-2">${{ product.discount_price }}</span>
+          {% else %}
+          <span class="fw-bold">${{ product.price }}</span>
+          {% endif %}
+        </div>
+        <div class="mt-auto d-flex align-items-center justify-content-between">
+          <div class="input-group input-group-sm product-qty" style="width: 110px;">
+            <button type="button" class="btn btn-outline-secondary btn-number" data-type="minus">-</button>
+            <input type="text" name="quantity" class="form-control text-center input-number" value="1" min="1" max="{{ product.stock_quantity }}">
+            <button type="button" class="btn btn-outline-secondary btn-number" data-type="plus">+</button>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm">
+            Add to Cart <iconify-icon icon="uil:shopping-cart"></iconify-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col">
+    <p class="text-center">No products available.</p>
+  </div>
+  {% endfor %}
+</div> -->
 
-              <!-- / product-grid -->
-              </div>
+<div class="product-grid row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+  {% for product in products %}
+  <div class="col">
+    <div class="card h-100 shadow-sm position-relative">
+      {% if product.discount_price %}
+      <span style="background-color: red;" class="badge position-absolute top-0 start-0 m-3">
+        -{{ product.get_discount_percent }}%
+      </span>
+      {% endif %}
+      <a href="#" class="btn btn-outline-danger btn-sm position-absolute top-0 end-0 m-3" aria-label="Add to wishlist">
+        <svg width="20" height="20" fill="currentColor">
+          <use xlink:href="#heart"></use>
+        </svg>
+      </a>
+      <a href="{% url 'product_detail' product.slug %}" style="text-decoration: none;" title="{{ product.name }}">
+        {% if product.image %}
+        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="object-fit: cover; height: 200px;">
+        {% else %}
+        <img src="{% static 'images/no-image.png' %}" class="card-img-top" alt="No Image" style="object-fit: cover; height: 200px;">
+        {% endif %}
+      <div class="card-body d-flex flex-column">
+        <h5 class="card-title">{{ product.name }}</h5>
+
+        <!-- New block with stock, rating, and price stacked -->
+        <div class="">
+          <p class="card-text mb-1 text-muted">{{ product.stock_quantity }} in stock</p>
+          <p class="mb-1">
+            <span class="text-primary me-2" style="vertical-align: middle;">
+              <svg width="16" height="16" fill="currentColor" class="bi bi-star-fill" style="vertical-align: middle;">
+                <use xlink:href="#star-solid"></use>
+              </svg> 4.5
+            </span>
+          </p>
+          <p class="fs-5 mb-0">
+            {% if product.discount_price %}
+              <span class="text-muted text-decoration-line-through">${{ product.price }}</span>
+              <span style="color: red;" class="fw-bold ms-2">${{ product.discount_price }}</span>
+            {% else %}
+              <span class="fw-bold">${{ product.price }}</span>
+            {% endif %}
+          </p>
+        </div>
+      </a>
+
+        <div class="mt-auto d-flex align-items-center justify-content-between">
+          <div class="input-group input-group-sm product-qty" style="width: 110px;">
+            <button type="button" class="btn btn-outline-secondary btn-number" data-type="minus">-</button>
+            <input type="text" name="quantity" class="form-control text-center input-number" value="1" min="1" max="{{ product.stock_quantity }}">
+            <button type="button" class="btn btn-outline-secondary btn-number" data-type="plus">+</button>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm">
+            Add to Cart <iconify-icon icon="uil:shopping-cart"></iconify-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  {% empty %}
+  <div class="col">
+    <p class="text-center">No products available.</p>
+  </div>
+  {% endfor %}
+</div>
+
+
             </div>
 
             <div class="tab-pane fade" id="nav-fruits" role="tabpanel" aria-labelledby="nav-fruits-tab">
