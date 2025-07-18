@@ -41,7 +41,7 @@ class Product(models.Model):
     discount_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     tags = models.ManyToManyField(Tag, blank=True)
     categories = models.ManyToManyField(Category)
-    brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
+    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True)
 
     tags = models.CharField(max_length=255, blank=True, help_text="Comma-separated tags")
     image = models.ImageField(upload_to='products/', blank=True, null=True)
