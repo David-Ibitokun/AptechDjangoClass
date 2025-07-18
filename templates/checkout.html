@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-5">
+  <div class="text-center">
+    <h2 class="text-success">🎉 Order Submitted Successfully!</h2>
+    <p>Thank you, {{ user.username }}! Your order has been placed.</p>
+  </div>
+
+  <hr>
+
+  <h4 class="mt-4">Order Summary</h4>
+
+  {% if order %}
+  <table class="table table-bordered table-striped mt-3">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Quantity</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in order.orderitem_set.all %}
+      <tr>
+        <td>{{ item.product.name }}</td>
+        <td>{{ item.quantity }}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <td class="text-end"><strong>Total:</strong></td>
+        <td><strong>₦{{ order.total_price }}</strong></td>
+      </tr>
+    </tbody>
+  </table>
+  {% else %}
+    <p>No order information found.</p>
+  {% endif %}
+
+  <div class="text-center mt-4">
+    <a href="{% url 'home' %}" class="btn btn-primary">Continue Shopping</a>
+  </div>
+</div>
+{% endblock %}

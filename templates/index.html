@@ -402,7 +402,7 @@
         -{{ product.get_discount_percent }}%
       </span>
       {% endif %}
-      <a href="#" class="btn btn-outline-danger btn-sm position-absolute top-0 end-0 m-3" aria-label="Add to wishlist">
+      <a href="{% url 'add_to_wishlist' product.id %}" class="btn btn-outline-danger btn-sm position-absolute top-0 end-0 m-3" aria-label="Add to wishlist">
         <svg width="20" height="20" fill="currentColor">
           <use xlink:href="#heart"></use>
         </svg>
@@ -443,9 +443,20 @@
             <input type="text" name="quantity" class="form-control text-center input-number" value="1" min="1" max="{{ product.stock_quantity }}">
             <button type="button" class="btn btn-outline-secondary btn-number" data-type="plus">+</button>
           </div>
-          <button type="button" class="btn btn-primary btn-sm">
+          <!-- <button type="button" class="btn btn-primary btn-sm">
             Add to Cart <iconify-icon icon="uil:shopping-cart"></iconify-icon>
-          </button>
+          </button> -->
+
+{% if user.is_authenticated %}
+  <a href="{% url 'add_to_cart' product.id %}" class="btn btn-primary">Add to Cart</a>
+{% else %}
+  <a href="{% url 'login' %}?next={% url 'add_to_cart' product.id %}" class="btn btn-warning">
+    Login to Add to Cart
+  </a>
+{% endif %}
+
+
+
         </div>
       </div>
     </div>
