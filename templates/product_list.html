@@ -14,8 +14,8 @@
             <div class="card-body">
               <h5 class="card-title">{{ product.name }}</h5>
               <p class="card-text">{{ product.description|truncatewords:20 }}</p>
-              <p class="text-muted mb-0">${{ product.get_display_price }}</p>
-              <small class="text-secondary">{{ product.created_at|date:"M d, Y" }}</small>
+              <p style="color: rgb(240, 56, 56);">₦{{ product.get_display_price }}</p>
+              <small class="text-muted">{{ product.created_at|date:"M d, Y" }}</small>
             </div>
           </div>
         </div>
