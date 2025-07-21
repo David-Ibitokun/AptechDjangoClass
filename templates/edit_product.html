@@ -1,12 +1,16 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load widget_tweaks %} {# Keep widget_tweaks for other fields #}
 
-{% block title %}Add New Product{% endblock %}
+{% block title %}Edit Product{% endblock %}
 
 {% block content %}
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+{# Note: Bootstrap CSS is usually loaded in base.html. Adding it here again is redundant. #}
+{# <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> #}
 
-{{ form.media.css }} 
+{# --- django-select2 CSS (rendered by form.media) --- #}
+{# This line automatically includes CSS files required by widgets in your form (like Select2) #}
+{{ form.media.css }}
 
 {# --- START: Inline CSS for clickable categories --- #}
 <style>
@@ -58,13 +62,15 @@
 </style>
 {# --- END: Inline CSS for clickable categories --- #}
 
-
-<div class="container py-4">
-    <div class="card shadow">
-        <div class="card-header bg-warning text-dark fw-bold">Add New Product</div>
+<div class="container my-5">
+    <div class="card shadow rounded-4">
+        <div class="card-header bg-primary text-white fw-bold rounded-top-4">
+            Edit Product
+        </div>
         <form method="post" enctype="multipart/form-data" class="p-4">
             {% csrf_token %}
 
+            {# Display non-field errors if any form-wide issues #}
             {% if form.non_field_errors %}
                 <div class="alert alert-danger" role="alert">
                     {% for error in form.non_field_errors %}
@@ -75,64 +81,68 @@
 
             <div class="row mb-3">
                 <div class="col-md-6">
-                    {{ form.name.label_tag }}
-                    {{ form.name }}
+                    <label for="{{ form.name.id_for_label }}" class="form-label">Product Name</label>
+                    {{ form.name|add_class:"form-control" }}
                     {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors }}</div>{% endif %}
                 </div>
                 <div class="col-md-6">
-                    {{ form.brand_name.label_tag }}
-                    {{ form.brand_name }}
-                    {% if form.brand_name.errors %}<div class="text-danger small">{{ form.brand_name.errors }}</div>{% endif %}
+                    <label for="{{ form.brand_name.id_for_label }}" class="form-label">Brand</label> {# Changed from form.brand to form.brand_name #}
+                    {{ form.brand_name|add_class:"form-select" }} {# Changed from form.brand to form.brand_name #}
+                    {% if form.brand_name.errors %}<div class="text-danger small">{{ form.brand_name.errors }}</div>{% endif %} {# Changed #}
                 </div>
             </div>
 
             <div class="mb-3">
-                {{ form.description.label_tag }}
-                {{ form.description }}
+                <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                {{ form.description|add_class:"form-control" }}
                 {% if form.description.errors %}<div class="text-danger small">{{ form.description.errors }}</div>{% endif %}
             </div>
 
             <div class="row mb-3">
                 <div class="col-md-6">
-                    {{ form.price.label_tag }}
-                    {{ form.price }}
+                    <label for="{{ form.price.id_for_label }}" class="form-label">Price</label>
+                    {{ form.price|add_class:"form-control" }}
                     {% if form.price.errors %}<div class="text-danger small">{{ form.price.errors }}</div>{% endif %}
                 </div>
                 <div class="col-md-6">
-                    {{ form.discount_price.label_tag }}
-                    {{ form.discount_price }}
+                    <label for="{{ form.discount_price.id_for_label }}" class="form-label">Discount Price</label>
+                    {{ form.discount_price|add_class:"form-control" }}
                     {% if form.discount_price.errors %}<div class="text-danger small">{{ form.discount_price.errors }}</div>{% endif %}
                 </div>
             </div>
 
             <div class="mb-3">
-                {{ form.tags.label_tag }}
-                {{ form.tags }}
+                <label for="{{ form.tags.id_for_label }}" class="form-label">Tags</label>
+                {{ form.tags|add_class:"form-control" }}
                 <small class="form-text text-muted">{{ form.tags.help_text }}</small>
                 {% if form.tags.errors %}<div class="text-danger small">{{ form.tags.errors }}</div>{% endif %}
             </div>
 
             <div class="mb-3">
-                {{ form.image.label_tag }}
-                {{ form.image }}
+                <label for="{{ form.image.id_for_label }}" class="form-label">Product Image</label>
+                {{ form.image|add_class:"form-control" }}
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" class="img-thumbnail mt-2" style="height: 120px;">
+                {% endif %}
                 {% if form.image.errors %}<div class="text-danger small">{{ form.image.errors }}</div>{% endif %}
             </div>
 
             <div class="row mb-3">
                 <div class="col-md-6">
-                    {{ form.stock_quantity.label_tag }}
-                    {{ form.stock_quantity }}
-                    {% if form.stock_quantity.errors %}<div class="text-danger small">{{ form.stock_quantity.errors }}</div>{% endif %}
+                    <label for="{{ form.stock_quantity.id_for_label }}" class="form-label">Stock Quantity</label> {# Changed from form.stock to form.stock_quantity #}
+                    {{ form.stock_quantity|add_class:"form-control" }} {# Changed #}
+                    {% if form.stock_quantity.errors %}<div class="text-danger small">{{ form.stock_quantity.errors }}</div>{% endif %} {# Changed #}
                 </div>
                 <div class="col-md-6 d-flex align-items-center mt-4">
                     <div class="form-check">
                         {{ form.is_available }}
-                        <label class="form-check-label" for="{{ form.is_available.id_for_label }}">Is available</label>
+                        <label class="form-check-label ms-2" for="{{ form.is_available.id_for_label }}">Is Available</label>
                         {% if form.is_available.errors %}<div class="text-danger small">{{ form.is_available.errors }}</div>{% endif %}
                     </div>
                 </div>
             </div>
 
+            {# --- START: Category Selection Accordion (ADDED) --- #}
             <div class="mb-4 border rounded p-3 bg-light">
                 <h6 class="mb-3 fw-bold text-uppercase">Categories</h6>
                 
@@ -160,7 +170,7 @@
                                         <div class="category-choice mb-2 p-2 border rounded" data-category-id="{{ subcat.id }}">
                                             <input class="form-check-input visually-hidden"
                                                    type="radio"
-                                                   name="category"
+                                                   name="category" {# IMPORTANT: Name MUST be 'category' to match ProductForm's field #}
                                                    id="subcat-{{ subcat.id }}"
                                                    value="{{ subcat.id }}"
                                                    {% if selected_category_id == subcat.id %}checked{% endif %}>
@@ -175,20 +185,27 @@
                     {% endfor %}
                 </div>
             </div>
+            {# --- END: Category Selection Accordion (ADDED) --- #}
 
-            <div class="d-flex justify-content-end gap-2">
-                <button type="submit" class="btn btn-success">Add Product</button>
-                <a href="{% url 'product_list' %}" class="btn btn-secondary">Cancel</a>
+            <div class="d-flex justify-content-between mt-4"> {# Added mt-4 for spacing #}
+                <a href="{% url 'product_detail' product.slug %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-success">Save Changes</button>
             </div>
         </form>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{# You likely already have Bootstrap JS in your base.html, so this might be redundant #}
+{# <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> #}
+
+{# --- django-select2 JavaScript --- #}
+{# jQuery is a common dependency for Select2. Ensure it's loaded BEFORE Select2 JS. #}
+{# If your base.html already loads jQuery, you might not need this line #}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
 {{ form.media.js }} 
 
-{# --- START: JavaScript for clickable categories --- #}
+{# --- START: JavaScript for clickable categories (ADDED) --- #}
 <script>
     $(document).ready(function() {
         // Function to update visual selection based on checked radio button
@@ -199,7 +216,7 @@
             $('.category-choice input[type="radio"]:checked').closest('.category-choice').addClass('selected');
         }
 
-        // Initial update when the page loads (useful for edit product or form re-submission)
+        // Initial update when the page loads (important for existing product's category)
         updateCategoryVisuals();
 
         // Handle clicks on the custom styled category-choice divs
@@ -220,6 +237,6 @@
         });
     });
 </script>
-{# --- END: JavaScript for clickable categories --- #}
+{# --- END: JavaScript for clickable categories (ADDED) --- #}
 
 {% endblock %}

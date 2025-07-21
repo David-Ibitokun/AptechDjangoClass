@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+  <h3 class="mb-4">Search Results for "{{ query }}"</h3>
+
+  {% if products %}
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+      {% for product in products %}
+        <div class="col">
+          <div class="card h-100 shadow-sm">
+            {% if product.image %}
+              <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+            {% else %}
+              <img src="{% static 'images/no-image.png' %}" class="card-img-top" alt="No image">
+            {% endif %}
+            <div class="card-body">
+              <h5 class="card-title">{{ product.name }}</h5>
+              <p class="card-text">{{ product.description|truncatechars:80 }}</p>
+              <p class="text-muted small mb-1">
+                <strong>Brand:</strong> {{ product.brand.name }} <br>
+                <strong>Category:</strong> {{ product.category.name }}
+              </p>
+              {% if product.discount_price %}
+                <div class="text-danger fw-bold">
+                  ${{ product.discount_price }} <del class="text-muted">${{ product.price }}</del>
+                </div>
+              {% else %}
+                <div class="fw-bold">${{ product.price }}</div>
+              {% endif %}
+              <a href="{% url 'product_detail' product.slug %}" class="btn btn-outline-primary mt-2">View</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No products found.</p>
+  {% endif %}
+</div>
+{% endblock %}

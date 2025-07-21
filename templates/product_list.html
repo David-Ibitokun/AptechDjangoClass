@@ -1,28 +1,39 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container py-5">
-  <h2 class="mb-4 text-center text-primary">My Products</h2>
+    <h2 class="mb-4 text-center text-primary">My Products</h2>
 
-  {% if products %}
-    <div class="row">
-      {% for product in products %}
-        <div class="col-md-4 mb-4">
-          <div class="card h-100">
-            {% if product.image %}
-              <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
-            {% endif %}
-            <div class="card-body">
-              <h5 class="card-title">{{ product.name }}</h5>
-              <p class="card-text">{{ product.description|truncatewords:20 }}</p>
-              <p style="color: rgb(240, 56, 56);">₦{{ product.get_display_price }}</p>
-              <small class="text-muted">{{ product.created_at|date:"M d, Y" }}</small>
-            </div>
-          </div>
+    {% if products %}
+        <div class="row">
+            {% for product in products %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                        {% endif %}
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text">{{ product.description|truncatewords:20 }}</p>
+                            <p class="mb-2" style="color: rgb(240, 56, 56);">₦{{ product.get_display_price }}</p>
+                            <small class="text-muted mb-3">{{ product.created_at|date:"M d, Y" }}</small>
+
+                            {# Action Buttons #}
+                            <div class="mt-auto d-flex justify-content-between">
+                                {# CHANGED: URL name to 'edit_product' #}
+                                <a href="{% url 'edit_product' slug=product.slug %}" class="btn btn-primary btn-sm me-2">Edit</a>
+                                {# CHANGED: URL name to 'delete_product' #}
+                                <form action="{% url 'delete_product' slug=product.slug %}" method="post" onsubmit="return confirm('Are you sure you want to delete {{ product.name }}?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <p class="text-center text-muted">No products added yet.</p>
-  {% endif %}
+    {% else %}
+        <p class="text-center text-muted">No products added yet. <a href="{% url 'add_product' %}">Add your first product!</a></p>
+    {% endif %}
 </div>
 {% endblock %}
