@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Vendor Dashboard - My Orders{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold text-primary display-5 mb-3">My Customer Orders</h2>
+            <p class="lead text-muted">Review and manage orders containing your products.</p>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="mb-5 text-center d-flex flex-wrap justify-content-center gap-3">
+            <a href="{% url 'add_product' %}" class="btn btn-outline-primary btn-lg rounded-pill shadow-sm">
+                <i class="fas fa-plus-circle me-2"></i> Add New Product
+            </a>
+            <a href="{% url 'product_list' %}" class="btn btn-outline-secondary btn-lg rounded-pill shadow-sm">
+                <i class="fas fa-boxes me-2"></i> Edit My Products
+            </a>
+            <a href="{% url 'vendor_orders' %}" class="btn btn-info btn-lg rounded-pill shadow-sm">
+                <i class="fas fa-receipt me-2"></i> My Orders
+            </a>
+        </div>
+
+        <!-- Orders List Section -->
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-body p-4">
+                <h4 class="card-title mb-4 fw-bold text-dark">All Orders ({{ orders.count|intcomma }})</h4>
+
+                {% if orders %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">Order ID</th>
+                                    <th scope="col">Customer</th>
+                                    <th scope="col">Items</th>
+                                    <th scope="col">Total (₦)</th>
+                                    <th scope="col">Order Date</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <th scope="row">#{{ order.id }}</th>
+                                    <td>{{ order.user.username|default:"Guest User" }}</td>
+                                    <td>
+                                        <ul class="list-unstyled mb-0">
+                                            {% for item in order.orderitem_set.all %}
+                                                {# Only show items from this vendor's products #}
+                                                {% if item.product.creator == request.user %}
+                                                    <li>{{ item.quantity }} x {{ item.product.name|truncatechars:30 }}</li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
+                                    <td>₦{{ order.total_price|intcomma }}</td>
+                                    <td>{{ order.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        {% if order.is_paid %}
+                                            <span class="badge bg-success py-2 px-3 rounded-pill">Paid</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark py-2 px-3 rounded-pill">Pending Payment</span>
+                                        {% endif %}
+                                        {# You could add more status badges here (e.g., Shipped, Delivered) if your Order model has a 'status' field #}
+                                    </td>
+                                    <td>
+                                        {# Link to a detailed order view (you'd need to create this view and URL) #}
+                                        <a href="#" class="btn btn-sm btn-outline-primary rounded-pill">View Order</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info text-center py-4 my-4 rounded-3 shadow-sm" role="alert">
+                        <h4 class="alert-heading"><i class="fas fa-info-circle me-2"></i> No Orders Found!</h4>
+                        <p>You currently don't have any customer orders for your products.</p>
+                        <hr>
+                        <p class="mb-0">Keep adding great products to attract more customers!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

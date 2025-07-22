@@ -4,7 +4,7 @@ from .views import (
     login, register, myProfile, page500, add_product, product_list,
     product_detail, brand_detail, brand_list, page503, remove_from_cart,
     add_to_cart, cart, search, wishlist_view, add_to_wishlist,
-    remove_from_wishlist, checkout, edit_product, delete_product, category_detail, view_cart  # 👈 Include these
+    remove_from_wishlist, checkout, edit_product, delete_product, category_detail, view_cart, vendor_orders, contact,# 👈 Include these
 )
 
 urlpatterns = [
@@ -26,6 +26,8 @@ urlpatterns = [
     path('product/list/', product_list, name='product_list'),
     path('product/<slug:slug>/', product_detail, name='product_detail'),
 
+    path('products/<slug:slug>/', singleProduct, name='singleProduct'),
+
     path('product/<slug:slug>/edit/', edit_product, name='edit_product'),
     path('product/<slug:slug>/delete/', delete_product, name='delete_product'),
 
@@ -40,7 +42,11 @@ urlpatterns = [
 
     path('wishlist/', wishlist_view, name='wishlist'),
     path('wishlist/add/<int:product_id>/', add_to_wishlist, name='add_to_wishlist'),
-    path('wishlist/remove/<int:product_id>/', remove_from_wishlist, name='remove_from_wishlist'),
+    path('wishlist/remove/<int:item_id>/', remove_from_wishlist, name='remove_from_wishlist'),
 
     path('checkout/', checkout, name='checkout'),
+    
+    path('vendor/orders/', vendor_orders, name='vendor_orders'),
+    
+    path('contact/', contact, name='contact'),
 ]

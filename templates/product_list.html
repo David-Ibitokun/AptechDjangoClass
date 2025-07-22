@@ -1,39 +1,140 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load humanize %} {# Assuming humanize is used for price formatting #}
+
+{% block title %}Vendor Dashboard - My Products{% endblock %}
+
 {% block content %}
-<div class="container py-5">
-    <h2 class="mb-4 text-center text-primary">My Products</h2>
-
-    {% if products %}
-        <div class="row">
-            {% for product in products %}
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow-sm">
-                        {% if product.image %}
-                            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
-                        {% endif %}
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">{{ product.name }}</h5>
-                            <p class="card-text">{{ product.description|truncatewords:20 }}</p>
-                            <p class="mb-2" style="color: rgb(240, 56, 56);">₦{{ product.get_display_price }}</p>
-                            <small class="text-muted mb-3">{{ product.created_at|date:"M d, Y" }}</small>
-
-                            {# Action Buttons #}
-                            <div class="mt-auto d-flex justify-content-between">
-                                {# CHANGED: URL name to 'edit_product' #}
-                                <a href="{% url 'edit_product' slug=product.slug %}" class="btn btn-primary btn-sm me-2">Edit</a>
-                                {# CHANGED: URL name to 'delete_product' #}
-                                <form action="{% url 'delete_product' slug=product.slug %}" method="post" onsubmit="return confirm('Are you sure you want to delete {{ product.name }}?');">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold text-primary display-5 mb-3">Your Vendor Dashboard</h2>
+            <p class="lead text-muted">Hello, <span class="fw-semibold text-dark">{{ request.user.first_name|default:"Vendor" }}</span>! Seamlessly manage your product listings and inventory here.</p>
         </div>
-    {% else %}
-        <p class="text-center text-muted">No products added yet. <a href="{% url 'add_product' %}">Add your first product!</a></p>
-    {% endif %}
-</div>
+
+        <!-- Navigation Buttons -->
+        <div class="mb-5 text-center d-flex flex-wrap justify-content-center gap-3">
+            <a href="{% url 'add_product' %}" class="btn btn-outline-primary btn-lg rounded-pill shadow-sm">
+                <i class="fas fa-plus-circle me-2"></i> Add New Product
+            </a>
+            <a href="{% url 'product_list' %}" class="btn btn-secondary btn-lg rounded-pill shadow-sm">
+                <i class="fas fa-boxes me-2"></i> Edit My Products
+            </a>
+            {# Link to My Orders - ensure 'vendor_orders' URL is defined in urls.py and view exists #}
+            <a href="{% url 'vendor_orders' %}" class="btn btn-outline-info btn-lg rounded-pill shadow-sm">
+                <i class="fas fa-receipt me-2"></i> My Orders
+            </a>
+            {# You might add links to settings etc. here later #}
+        </div>
+
+        <!-- Product List Section -->
+        <div class="card shadow-lg border-0 rounded-4 mb-5"> {# Added mb-5 for spacing below #}
+            <div class="card-body p-4">
+                <h4 class="card-title mb-4 fw-bold text-dark">My Product Listings ({{ products.count|intcomma }})</h4>
+
+                {% if products %}
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                        {% for product in products %}
+                            <div class="col">
+                                <div class="card h-100 shadow-sm border-0 rounded-3 product-item-card">
+                                    <a href="{% url 'product_detail' product.slug %}" class="text-decoration-none">
+                                        {% if product.image %}
+                                            <img src="{{ product.image.url }}" class="card-img-top rounded-top-3 product-img" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+                                        {% else %}
+                                            <img src="https://placehold.co/400x200/cccccc/333333?text=No+Image" class="card-img-top rounded-top-3 product-img" alt="No Image Available" style="height: 200px; object-fit: cover;">
+                                        {% endif %}
+                                    </a>
+                                    <div class="card-body d-flex flex-column">
+                                        <h5 class="card-title fw-bold text-truncate mb-2">
+                                            <a href="{% url 'product_detail' product.slug %}" class="text-decoration-none text-dark">{{ product.name }}</a>
+                                        </h5>
+                                        {% if product.brand %}
+                                            <p class="card-text text-muted small mb-1">Brand: {{ product.brand.name }}</p>
+                                        {% endif %}
+                                        {% if product.category %}
+                                            <p class="card-text text-muted small mb-1">Category: {{ product.category.name }}</p>
+                                        {% endif %}
+                                        <p class="card-text mb-2">
+                                            {% if product.discount_price and product.discount_price < product.price %}
+                                                <span class="text-danger fw-bold fs-5">₦{{ product.discount_price|intcomma }}</span>
+                                                <span class="text-muted text-decoration-line-through ms-2">₦{{ product.price|intcomma }}</span>
+                                                <span class="badge bg-success ms-2">{{ product.get_discount_percent }}% OFF</span>
+                                            {% else %}
+                                                <span class="text-primary fw-bold fs-5">₦{{ product.price|intcomma }}</span>
+                                            {% endif %}
+                                        </p>
+                                        
+                                        <div class="d-flex align-items-center mb-3">
+                                            {% if product.is_available and product.stock_quantity > 0 %}
+                                                <span class="badge bg-success me-2 py-2 px-3 rounded-pill">
+                                                    <i class="fas fa-check-circle me-1"></i> In Stock ({{ product.stock_quantity|intcomma }})
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-danger me-2 py-2 px-3 rounded-pill">
+                                                    <i class="fas fa-times-circle me-1"></i> Out of Stock
+                                                </span>
+                                            {% endif %}
+                                        </div>
+
+                                        {# Added created_at date #}
+                                        <small class="text-muted mb-3">Added: {{ product.created_at|date:"M d, Y" }}</small>
+
+                                        <div class="mt-auto d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                            <a href="{% url 'product_detail' product.slug %}" class="btn btn-info btn-sm rounded-pill flex-grow-1">
+                                                <i class="fas fa-eye me-1"></i> View Details
+                                            </a>
+                                            <a href="{% url 'edit_product' product.slug %}" class="btn btn-warning btn-sm rounded-pill flex-grow-1">
+                                                <i class="fas fa-edit me-1"></i> Edit
+                                            </a>
+                                            <form action="{% url 'delete_product' product.slug %}" method="post" class="flex-grow-1">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger btn-sm rounded-pill w-100">
+                                                    <i class="fas fa-trash-alt me-1"></i> Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info text-center py-4 my-4 rounded-3 shadow-sm" role="alert">
+                        <h4 class="alert-heading"><i class="fas fa-info-circle me-2"></i> No Products Found!</h4>
+                        <p>It looks like you haven't added any products to your store yet.</p>
+                        <hr>
+                        <p class="mb-0">Start by clicking the "Add New Product" button above to list your first item.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<style>
+    /* Custom styles for product cards */
+    .product-item-card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    .product-item-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+    .product-img {
+        width: 100%;
+        height: 200px; /* Fixed height for consistency */
+        object-fit: cover;
+    }
+    .card-title a {
+        color: inherit; /* Inherit color from parent for consistency */
+    }
+    .card-title a:hover {
+        color: var(--bs-primary); /* Change color on hover */
+    }
+    /* Ensure delete button fills space if flex-grow-1 is on form */
+    .product-item-card form.flex-grow-1 button {
+        width: 100%;
+    }
+</style>
 {% endblock %}

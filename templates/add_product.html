@@ -4,7 +4,8 @@
 {% block title %}Add New Product{% endblock %}
 
 {% block content %}
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+{# Removed redundant Bootstrap CSS link here, assuming it's in base.html #}
+{# <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> #}
 
 {{ form.media.css }} 
 
@@ -55,13 +56,41 @@
     .category-choice .form-check-label {
         cursor: pointer; /* Keep cursor pointer on label too */
     }
+
+    /* Added style for icons for better alignment */
+    .accordion-button i,
+    .category-choice i {
+        margin-right: 8px; /* Space between icon and text */
+        width: 1.25em; /* Ensure consistent width for icons */
+        text-align: center; /* Center icon within its allocated space */
+    }
 </style>
 {# --- END: Inline CSS for clickable categories --- #}
 
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold text-primary display-5 mb-3">Your Vendor Dashboard</h2>
+            <p class="lead text-muted">Hello, <span class="fw-semibold text-dark">{{ request.user.first_name|default:"Vendor" }}</span>! Seamlessly manage your product listings and inventory here.</p>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="mb-5 text-center d-flex flex-wrap justify-content-center gap-3">
+            <a href="{% url 'add_product' %}" class="btn btn-primary btn-lg rounded-pill shadow-sm">
+                <i class="fas fa-plus-circle me-2"></i> Add New Product
+            </a>
+            <a href="{% url 'product_list' %}" class="btn btn-outline-secondary btn-lg rounded-pill shadow-sm">
+                <i class="fas fa-boxes me-2"></i> Edit My Products
+            </a>
+            {# NEW: Link to My Orders #}
+            <a href="{% url 'vendor_orders' %}" class="btn btn-outline-info btn-lg rounded-pill shadow-sm">
+                <i class="fas fa-receipt me-2"></i> My Orders
+            </a>
+            {# You might add links to settings etc. here later #}
+        </div>
 
 <div class="container py-4">
     <div class="card shadow">
-        <div class="card-header bg-warning text-dark fw-bold">Add New Product</div>
+        <div class="card-header bg-primary text-white fw-bold">Add New Product</div>
         <form method="post" enctype="multipart/form-data" class="p-4">
             {% csrf_token %}
 
@@ -148,6 +177,8 @@
                                         type="button" data-bs-toggle="collapse"
                                         data-bs-target="#collapse-{{ parent.slug }}" aria-expanded="false"
                                         aria-controls="collapse-{{ parent.slug }}">
+                                    {# ADDED: Icon for parent category #}
+                                    {% if parent.icon %}<i class="{{ parent.icon }}"></i>{% endif %}
                                     {{ parent.name }}
                                 </button>
                             </h2>
@@ -165,6 +196,8 @@
                                                    value="{{ subcat.id }}"
                                                    {% if selected_category_id == subcat.id %}checked{% endif %}>
                                             <label class="form-check-label w-100" for="subcat-{{ subcat.id }}">
+                                                {# ADDED: Icon for subcategory #}
+                                                {% if subcat.icon %}<i class="{{ subcat.icon }}"></i>{% endif %}
                                                 {{ subcat.name }}
                                             </label>
                                         </div>
@@ -176,15 +209,17 @@
                 </div>
             </div>
 
-            <div class="d-flex justify-content-end gap-2">
-                <button type="submit" class="btn btn-success">Add Product</button>
+            <div class="d-flex justify-content-between mt-4 row-reverse"> {# Added mt-4 for spacing #}
                 <a href="{% url 'product_list' %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Add Product</button>
             </div>
+
         </form>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{# Removed redundant Bootstrap JS link here, assuming it's in base.html #}
+{# <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> #}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 {{ form.media.js }} 
 

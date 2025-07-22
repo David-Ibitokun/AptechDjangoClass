@@ -3,7 +3,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Q, Sum, F
 from django.urls import reverse
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -30,13 +30,49 @@ def home(request):
     }
     return render(request, 'index.html', context)
 
+def contact(request):
+    """
+    Renders the contact page.
+    You can add form handling logic here later if you create a contact form.
+    """
+    return render(request, 'contact.html')
 
 def category_detail(request, slug):
+    """
+    Renders a category detail page, displaying the category's information
+    and all products belonging to it or any of its subcategories.
+    """
     category = get_object_or_404(Category, slug=slug)
-    products = Product.objects.filter(category=category)
+
+    # Get the current category's ID
+    category_ids = [category.id]
+
+    # Recursively get IDs of all subcategories
+    # This is a simple recursive approach. For very deep hierarchies,
+    # consider a more optimized method or a tree-specific Django package.
+    def get_descendant_ids(current_category):
+        ids = []
+        for subcat in current_category.subcategories.all():
+            ids.append(subcat.id)
+            ids.extend(get_descendant_ids(subcat)) # Recursively get sub-subcategories
+        return ids
+
+    category_ids.extend(get_descendant_ids(category))
+
+    # Filter products by all collected category IDs
+    products = Product.objects.filter(category__id__in=category_ids, is_available=True).order_by('name')
+
+    # Build breadcrumb list (from root to current)
+    breadcrumb = []
+    current = category
+    while current:
+        breadcrumb.insert(0, current)
+        current = current.parent
+
     return render(request, 'category_detail.html', {
         'category': category,
         'products': products,
+        'breadcrumb': breadcrumb,
     })
 
 def about(request):
@@ -68,7 +104,7 @@ def singleProduct(request, slug):
     context = {
         'product': product
     }
-    return render(request, 'single-product.html', context)
+    return render(request, 'brand_detail.html', context)
 
 def cart(request):
     """
@@ -98,7 +134,7 @@ def page404(request):
     """
     Renders the 404 Not Found page.
     """
-    return render(request, '404.html', status=404)
+    return render(request, 'page404.html', status=404)
 
 def login(request):
     """
@@ -122,13 +158,13 @@ def page500(request):
     """
     Renders the 500 Internal Server Error page.
     """
-    return render(request, '500.html', status=500)
+    return render(request, 'page500.html', status=500)
 
 def page503(request):
     """
     Renders the 503 Service Unavailable page.
     """
-    return render(request, '503.html', status=503)
+    return render(request, 'page503.html', status=503)
 
 # --- Vendor/Seller Dashboard Views ---
 
@@ -142,6 +178,25 @@ def product_list(request):
         'products': products
     }
     return render(request, 'product_list.html', context)
+
+
+@login_required(login_url='login')
+def vendor_orders(request):
+    """
+    Displays a list of orders that contain products created by the logged-in vendor.
+    """
+    # Get all OrderItems where the product's creator is the current user
+    # Use select_related to optimize fetching related Order and Product objects
+    vendor_order_items = OrderItem.objects.filter(product__creator=request.user).select_related('order', 'product')
+
+    # Get unique Order objects from these OrderItems
+    # This ensures each order is listed only once, even if it contains multiple products from the vendor
+    vendor_orders_list = Order.objects.filter(orderitem__in=vendor_order_items).distinct().order_by('-created_at')
+
+    context = {
+        'orders': vendor_orders_list,
+    }
+    return render(request, 'vendor_orders.html', context)
 
 @login_required(login_url='login')
 def product_detail(request, slug):
@@ -174,11 +229,8 @@ def generate_unique_slug(name):
 @login_required(login_url='login')
 def add_product(request):
     form = ProductForm(request.POST or None, request.FILES or None)
-    # RE-ADDED: top_level_categories for the custom category accordion
     top_level_categories = Category.objects.filter(parent__isnull=True).prefetch_related('subcategories')
 
-    # This will hold the ID of the selected category if the form fails validation,
-    # so we can re-select the correct radio button.
     selected_category_id = None
     if request.method == 'POST' and 'category' in request.POST:
         try:
@@ -186,83 +238,51 @@ def add_product(request):
         except (TypeError, ValueError):
             selected_category_id = None
 
-
-    # --- DEBUGGING PRINTS (KEEP THESE FOR NOW) ---
-    print(f"DEBUG VIEWS: User accessing add_product: {request.user}")
-    print(f"DEBUG VIEWS: Is authenticated: {request.user.is_authenticated}")
-    if request.user.is_authenticated:
-        print(f"DEBUG VIEWS: Authenticated User ID: {request.user.id}, Username: {request.user.username}")
-    # --- END DEBUGGING PRINTS ---
-
     if request.method == 'POST':
         if form.is_valid():
-            product = form.save(commit=False) # Get the product instance from the form
+            product = form.save(commit=False) # This already sets product.brand via form's save method
 
-            # --- DEBUGGING PRINTS (KEEP THESE FOR NOW) ---
-            print(f"DEBUG VIEWS: Form is valid. User at save point: {request.user}")
-            print(f"DEBUG VIEWS: Is authenticated at save point: {request.user.is_authenticated}")
-            # --- END DEBUGGING PRINTS ---
-
-            # THIS IS THE CRUCIAL LINE FOR ASSIGNING THE CREATOR
             if request.user.is_authenticated:
                 product.creator = request.user
-                print(f"DEBUG VIEWS: Creator assigned to product: {product.creator}")
             else:
                 messages.error(request, "Authentication required to add a product. Please log in again.")
-                print("DEBUG VIEWS: ERROR - User not authenticated when trying to assign creator.")
                 return redirect('login')
 
-            # RE-ADDED: Manual category handling as requested for accordion style
+            # Manual category handling for accordion style
             category_id = request.POST.get('category')
             if category_id:
                 try:
                     product.category = Category.objects.get(id=category_id)
                 except Category.DoesNotExist:
                     messages.error(request, "Selected category does not exist.")
-                    # If category is required in the Product model, you might want to
-                    # make the form invalid or redirect with a stronger error here.
                     product.category = None # Set to None if it's optional
             else:
                 product.category = None # Ensure it's explicitly None if not selected and allowed
 
             try:
-                # Assign a unique slug before saving (if your Product model doesn't handle it on save)
-                if not product.slug:
-                    product.slug = generate_unique_slug(product.name)
-
-                product.save() # This saves the product instance with the assigned creator
-                form.save_m2m() # This is crucial for saving ManyToMany fields like 'tags'
-
+                form.save()
                 messages.success(request, f"Product '{product.name}' added successfully!")
-                return redirect('product_list') # Redirect to the vendor's product list page
+                return redirect('product_list')
             except IntegrityError as e:
                 messages.error(request, f"A product with that name or slug might already exist, or another database error occurred: {e}")
-                print(f"DEBUG VIEWS: IntegrityError saving product: {e}")
-            except Exception as e: # Catch any other unexpected errors during save
+            except Exception as e:
                 messages.error(request, f"An unexpected error occurred while saving the product: {e}")
-                print(f"DEBUG VIEWS: General error saving product: {e}")
         else:
-            # If form is not valid, print errors for debugging
-            print(f"DEBUG VIEWS: Form is NOT valid. Errors: {form.errors.as_json()}")
             messages.error(request, "Please correct the errors in the form.")
 
     context = {
         'form': form,
-        'top_level_categories': top_level_categories, # RE-ADDED to context
-        'selected_category_id': selected_category_id, # Pass for re-selecting radio button
+        'top_level_categories': top_level_categories,
+        'selected_category_id': selected_category_id,
     }
     return render(request, 'add_product.html', context)
 
 
 @login_required(login_url='login')
 def edit_product(request, slug):
-    """
-    Handles editing an existing product by a vendor.
-    """
-    # Ensure only the creator can edit their product
-    product = get_object_or_404(Product, slug=slug, creator=request.user) 
-    
-    # RE-ADDED: top_level_categories for the custom category accordion in edit_product
+    product = get_object_or_404(Product, slug=slug, creator=request.user)
+
+    # ADDED / KEPT: top_level_categories and selected_category_id for the custom category accordion
     top_level_categories = Category.objects.filter(parent__isnull=True).prefetch_related('subcategories')
 
     selected_category_id = None
@@ -277,7 +297,7 @@ def edit_product(request, slug):
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES, instance=product)
         if form.is_valid():
-            # Manually handle category for edit as well, matching add_product's behavior
+            # KEPT: Manual category handling for edit
             category_id = request.POST.get('category')
             if category_id:
                 try:
@@ -288,7 +308,9 @@ def edit_product(request, slug):
             else:
                 product.category = None
 
-            product.save() # Save the product instance with the updated category
+            # The form.save() method will now automatically handle the 'brand' field
+            # and update the product instance.
+            product.save() # This saves the product instance with the updated category, brand, etc.
             form.save_m2m() # Save ManyToMany fields like tags
 
             messages.success(request, "Product updated successfully!")
@@ -296,13 +318,14 @@ def edit_product(request, slug):
         else:
             messages.error(request, "Please correct the errors below.")
     else:
-        form = ProductForm(instance=product)
+        form = ProductForm(instance=product) # Form will be pre-filled including brand_name
 
     context = {
         'form': form,
         'product': product,
-        'top_level_categories': top_level_categories, # RE-ADDED to context
-        'selected_category_id': selected_category_id, # Pass for re-selecting radio button
+        # ADDED / KEPT: for category accordion
+        'top_level_categories': top_level_categories,
+        'selected_category_id': selected_category_id,
     }
     return render(request, 'edit_product.html', context)
 
@@ -359,7 +382,7 @@ def add_to_cart(request, product_id):
 
     if not product.is_available or product.stock_quantity == 0:
         messages.error(request, f"{product.name} is currently out of stock or unavailable.")
-    return redirect(request.META.get('HTTP_REFERER', 'shop'))
+        return redirect(request.META.get('HTTP_REFERER', 'shop'))
 
     try:
         quantity = int(request.POST.get('quantity', 1))
@@ -380,7 +403,7 @@ def add_to_cart(request, product_id):
         total_quantity = cart_item.quantity + quantity
         if total_quantity > product.stock_quantity:
             available_to_add = product.stock_quantity - cart_item.quantity
-            messages.warning(request, f"You can only add {available_item_to_add} more of {product.name}.")
+            messages.warning(request, f"You can only add {available_to_add} more of {product.name}.") # Corrected variable name
             return redirect(request.META.get('HTTP_REFERER', 'shop'))
         cart_item.quantity = total_quantity
         cart_item.save()
@@ -391,7 +414,6 @@ def add_to_cart(request, product_id):
         messages.success(request, f"{product.name} added to your cart.")
 
     return redirect(request.META.get('HTTP_REFERER', 'shop'))
-
 
 
 @login_required(login_url='login')
@@ -537,18 +559,25 @@ def add_to_wishlist(request, product_id):
         messages.error(request, f"Could not add {product.name} to wishlist: {e}")
     return redirect(request.META.get('HTTP_REFERER', 'wishlist_view'))
 
+
+
 @login_required(login_url='login')
 def remove_from_wishlist(request, item_id):
     """
     Removes a product from the user's wishlist.
     """
-    wishlist_item = get_object_or_404(Wishlist, id=item_id, user=request.user)
-    product_name = wishlist_item.product.name
-    wishlist_item.delete()
-    messages.info(request, f"{product_name} removed from your wishlist.")
+    # Ensure this line is correctly indented (4 spaces from 'def')
+    try:
+        wishlist_item = get_object_or_404(Wishlist, id=item_id, user=request.user)
+        product_name = wishlist_item.product.name
+        wishlist_item.delete()
+        messages.info(request, f"{product_name} removed from your wishlist.")
+    except Exception as e: # Catch any potential errors, though get_object_or_404 handles 404s
+        messages.error(request, f"Error removing item from wishlist: {e}")
     return redirect('wishlist_view')
 
-@login_required(login_url='login')
+
+@login_required(login_url='login') # Corrected: login_url='login'
 def wishlist_view(request):
     """
     Displays the user's wishlist.
