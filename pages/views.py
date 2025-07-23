@@ -1,4 +1,6 @@
-# your_app_name/views.py
+
+
+
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -16,6 +18,8 @@ from .forms import ProductForm
 User = get_user_model() # Get the currently active user model
 
 # --- Public Facing Views ---
+
+
 
 def home(request):
     """
@@ -106,7 +110,7 @@ def singleProduct(request, slug):
     }
     return render(request, 'brand_detail.html', context)
 
-def cart(request):
+def view_cart(request):
     """
     Renders the user's cart page, displaying all items.
     """
@@ -152,7 +156,7 @@ def myProfile(request):
     """
     Renders the user's profile page.
     """
-    return render(request, 'my-profile.html')
+    return render(request, 'myProfile.html')
 
 def page500(request):
     """
@@ -310,8 +314,7 @@ def edit_product(request, slug):
 
             # The form.save() method will now automatically handle the 'brand' field
             # and update the product instance.
-            product.save() # This saves the product instance with the updated category, brand, etc.
-            form.save_m2m() # Save ManyToMany fields like tags
+            form.save()
 
             messages.success(request, "Product updated successfully!")
             return redirect('product_list')
@@ -328,6 +331,34 @@ def edit_product(request, slug):
         'selected_category_id': selected_category_id,
     }
     return render(request, 'edit_product.html', context)
+
+
+def brand_detail(request, slug=None, pk=None): # Modified to accept both slug and pk
+    """
+    Displays details for a single brand and its products.
+    Can be accessed by slug or primary key.
+    """
+    from django.http import Http404 # Import Http404 here
+    if slug:
+        brand = get_object_or_404(Brand, slug=slug)
+    elif pk:
+        brand = get_object_or_404(Brand, pk=pk)
+    else:
+        # This case should ideally not be reached if URL patterns are set up correctly
+        # but as a fallback, raise a 404 or redirect
+        raise Http404("No brand identifier provided.") # Import Http404 if needed
+
+    products = Product.objects.filter(brand=brand, is_available=True).order_by('-created_at')
+    
+    # Get top-level categories for the base template's navigation
+    top_level_categories = Category.objects.filter(parent__isnull=True).order_by('name')
+
+    context = {
+        'brand': brand,
+        'products': products,
+        'top_level_categories': top_level_categories, # Pass for base.html
+    }
+    return render(request, 'brand_detail.html', context)
 
 
 @login_required(login_url='login')
@@ -451,15 +482,31 @@ def update_cart_quantity(request, item_id):
             messages.error(request, "Invalid quantity.")
     return redirect('cart')
 
+
+
 @login_required(login_url='login')
-def view_cart(request): # This is a duplicate of `cart` view, consider removing one.
-    cart, _ = Cart.objects.get_or_create(user=request.user)
-    items = CartItem.objects.filter(cart=cart)
-    total = sum(item.get_total_price() for item in items)
-    return render(request, 'cart.html', {
-        'items': items,
-        'total': total
-    })
+def update_cart_quantity(request, item_id):
+    """
+    Updates the quantity of a product in the user's cart.
+    """
+    cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
+    if request.method == 'POST':
+        try:
+            new_quantity = int(request.POST.get('quantity', 1))
+            if new_quantity <= 0:
+                messages.error(request, "Quantity must be at least 1.")
+                return redirect('cart')
+
+            if new_quantity > cart_item.product.stock_quantity:
+                messages.error(request, f"Cannot update quantity for {cart_item.product.name}. Only {cart_item.product.stock_quantity} available.")
+                return redirect('cart')
+
+            cart_item.quantity = new_quantity
+            cart_item.save()
+            messages.success(request, f"Quantity for {cart_item.product.name} updated.")
+        except ValueError:
+            messages.error(request, "Invalid quantity.")
+    return redirect('cart')
 
 
 @login_required(login_url='login')
@@ -474,7 +521,7 @@ def checkout(request):
 
     if not cart_items.exists():
         messages.warning(request, "Your cart is empty. Please add items before checking out.")
-        return redirect('shop')
+        return redirect('home')
 
     total_price = cart.get_total_price()
 
@@ -587,3 +634,15 @@ def wishlist_view(request):
         'wishlist_items': wishlist_items
     }
     return render(request, 'wishlist.html', context)
+
+
+@login_required(login_url='login')
+def recent_order(request):
+    """
+    Displays a list of recent orders for the logged-in user.
+    """
+    orders = Order.objects.filter(user=request.user).order_by('-created_at') # Most recent first
+    context = {
+        'orders': orders,
+    }
+    return render(request, 'recent_orders.html', context)

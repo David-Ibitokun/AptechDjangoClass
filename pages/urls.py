@@ -3,8 +3,9 @@ from .views import (
     home, about, shop, singleProduct, myAccount, page404,
     login, register, myProfile, page500, add_product, product_list,
     product_detail, brand_detail, brand_list, page503, remove_from_cart,
-    add_to_cart, cart, search, wishlist_view, add_to_wishlist,
-    remove_from_wishlist, checkout, edit_product, delete_product, category_detail, view_cart, vendor_orders, contact,# 👈 Include these
+    add_to_cart, search, wishlist_view, add_to_wishlist,
+    remove_from_wishlist, checkout, edit_product, delete_product, category_detail, view_cart, vendor_orders, contact,
+    recent_order, update_cart_quantity,
 )
 
 urlpatterns = [
@@ -32,11 +33,11 @@ urlpatterns = [
     path('product/<slug:slug>/delete/', delete_product, name='delete_product'),
 
     path('brands/', brand_list, name='brand_list'),
-    path('brands/<int:brand_id>/', brand_detail, name='brand_detail'),
-
+    
     path('cart/add/<int:product_id>/', add_to_cart, name='add_to_cart'),
     path('cart/', view_cart, name='cart'),
     path('cart/remove/<int:item_id>/', remove_from_cart, name='remove_from_cart'),
+    path('cart/update/<int:item_id>/', update_cart_quantity, name='update_cart_quantity'), 
 
     path('search/', search, name='search'),
 
@@ -49,4 +50,8 @@ urlpatterns = [
     path('vendor/orders/', vendor_orders, name='vendor_orders'),
     
     path('contact/', contact, name='contact'),
+    path('brands/<slug:slug>/', brand_detail, name='brand_detail'),
+    path('brands/<int:pk>/', brand_detail, name='brand_detail_by_id'), 
+
+    path('my-orders/', recent_order, name='recent_order'),
 ]

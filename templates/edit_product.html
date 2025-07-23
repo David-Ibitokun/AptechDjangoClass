@@ -5,14 +5,7 @@
 {% block title %}Edit Product{% endblock %}
 
 {% block content %}
-{# Note: Bootstrap CSS is usually loaded in base.html. Adding it here again is redundant. #}
-{# <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> #}
-
-{# --- django-select2 CSS (rendered by form.media) --- #}
-{# This line automatically includes CSS files required by widgets in your form (like Select2) #}
-{{ form.media.css }}
-
-{# --- START: Inline CSS for clickable categories --- #}
+{# --- START: Inline CSS for clickable categories and general styling enhancements --- #}
 <style>
     /* Custom Styles for Clickable Category Choices */
 
@@ -34,17 +27,20 @@
         cursor: pointer;
         background-color: #f8f9fa; /* Light background */
         border: 1px solid #dee2e6; /* Light gray border */
-        border-radius: .25rem; /* Slightly rounded corners */
+        border-radius: .5rem; /* More rounded corners */
         transition: all 0.2s ease-in-out; /* Smooth transition for hover/selection */
-        display: block; /* Make it a block element for full width/padding */
-        padding: .5rem .75rem; /* Padding inside the clickable area */
+        display: flex; /* Use flex for icon and text alignment */
+        align-items: center; /* Vertically center icon and text */
+        padding: .75rem 1rem; /* More padding inside the clickable area */
+        font-size: 0.95rem; /* Slightly larger font */
+        color: #343a40; /* Darker text color */
     }
 
     /* Hover effect */
     .category-choice:hover {
         background-color: #e9ecef; /* Slightly darker background on hover */
         border-color: #0d6efd; /* Blue border on hover */
-        box-shadow: 0 0 .25rem rgba(13, 110, 253, .25); /* Subtle shadow on hover */
+        box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .25); /* More prominent subtle shadow on hover */
     }
 
     /* Style for the selected category */
@@ -53,109 +49,213 @@
         border-color: #198754; /* Green border for selected */
         font-weight: bold; /* Make text bold for selected */
         color: #0f5132; /* Darker text for selected */
+        box-shadow: 0 0 0 .25rem rgba(25, 135, 84, .25); /* Green shadow for selected */
     }
 
     /* Ensure the label takes full width for clicking */
     .category-choice .form-check-label {
         cursor: pointer; /* Keep cursor pointer on label too */
+        flex-grow: 1; /* Allow label to take available space */
     }
 
     /* Added style for icons for better alignment */
     .accordion-button i,
     .category-choice i {
-        margin-right: 8px; /* Space between icon and text */
-        width: 1.25em; /* Ensure consistent width for icons */
+        margin-right: 12px; /* More space between icon and text */
+        width: 1.5em; /* Ensure consistent width for icons */
         text-align: center; /* Center icon within its allocated space */
+        color: #6c757d; /* Default icon color */
+    }
+
+    /* Color for selected category icons */
+    .category-choice.selected i {
+        color: #198754; /* Green icon for selected */
+    }
+
+    /* Styling for accordion headers */
+    .accordion-button {
+        background-color: #f0f2f5; /* Slightly different background for accordion header */
+        font-weight: bold;
+        color: #343a40;
+        border-radius: .5rem; /* Rounded corners for accordion button */
+    }
+    .accordion-item {
+        border: none; /* Remove default accordion item borders */
+        margin-bottom: 0.5rem; /* Space between accordion items */
+        border-radius: .5rem; /* Rounded corners for accordion item */
+        overflow: hidden; /* Ensure rounded corners apply correctly */
+    }
+    .accordion-body {
+        background-color: #ffffff; /* White background for accordion body */
+        border-top: 1px solid #e9ecef; /* Light border at the top of the body */
+    }
+    .accordion-button:not(.collapsed) {
+        background-color: #e2e6ea; /* Slightly darker when open */
+        color: #0d6efd; /* Blue text when open */
+        box-shadow: inset 0 -1px 0 rgba(0,0,0,.125);
+    }
+    .accordion-button:not(.collapsed) i {
+        color: #0d6efd; /* Blue icon when open */
+    }
+
+    /* Form control specific styling */
+    .form-control, .form-select {
+        border-radius: .5rem; /* Consistent rounded corners */
+        padding: .75rem 1rem; /* More padding */
+        border: 1px solid #ced4da; /* Standard border */
+        box-shadow: inset 0 1px 2px rgba(0,0,0,.075); /* Subtle inner shadow */
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 .25rem rgba(13,110,253,.25);
+    }
+
+    /* Checkbox styling */
+    .form-check-input:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+
+    /* Image preview specific styles */
+    #image-preview-container {
+        border: 2px dashed #ced4da;
+        border-radius: .5rem;
+        min-height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        margin-top: 10px;
+        background-color: #f8f9fa;
+    }
+    #image-preview {
+        max-width: 100%;
+        max-height: 150px;
+        object-fit: contain; /* Ensures the entire image is visible */
+        display: none; /* Hidden by default until an image is loaded */
+    }
+    #image-preview-placeholder {
+        color: #6c757d;
+        font-style: italic;
     }
 </style>
-{# --- END: Inline CSS for clickable categories --- #}
+{# --- END: Inline CSS for clickable categories and general styling enhancements --- #}
 
-<div class="container my-5">
-    <div class="card shadow rounded-4">
-        <div class="card-header bg-primary text-white fw-bold rounded-top-4">
-            Edit Product
+{{ form.media.css }} 
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-primary display-5 mb-3">Your Vendor Dashboard</h2>
+        <p class="lead text-muted">Hello, <span class="fw-semibold text-dark">{{ request.user.first_name|default:"Vendor" }}</span>! Seamlessly manage your product listings and inventory here.</p>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="mb-5 text-center d-flex flex-wrap justify-content-center gap-3">
+        <a href="{% url 'add_product' %}" class="btn btn-outline-primary btn-lg rounded-pill shadow-sm">
+            <i class="fas fa-plus-circle me-2"></i> Add New Product
+        </a>
+        <a href="{% url 'product_list' %}" class="btn btn-secondary btn-lg rounded-pill shadow-sm">
+            <i class="fas fa-boxes me-2"></i> Edit My Products
+        </a>
+        <a href="{% url 'vendor_orders' %}" class="btn btn-outline-info btn-lg rounded-pill shadow-sm">
+            <i class="fas fa-receipt me-2"></i> My Orders
+        </a>
+    </div>
+
+    
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-primary display-5 mb-3">Edit Product</h2>
+        <p class="lead text-muted">Update details for product: <span class="fw-semibold text-dark">{{ product.name }}</span></p>
+    </div>
+
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white fw-bold py-3 px-4 rounded-top-4">
+            <h5 class="mb-0 text-white">Edit Product Details</h5>
         </div>
         <form method="post" enctype="multipart/form-data" class="p-4">
             {% csrf_token %}
 
             {# Display non-field errors if any form-wide issues #}
             {% if form.non_field_errors %}
-                <div class="alert alert-danger" role="alert">
+                <div class="alert alert-danger rounded-3" role="alert">
                     {% for error in form.non_field_errors %}
                         {{ error }}
                     {% endfor %}
                 </div>
             {% endif %}
 
-            <div class="row mb-3">
+            <div class="row mb-4">
                 <div class="col-md-6">
-                    <label for="{{ form.name.id_for_label }}" class="form-label">Product Name</label>
-                    {{ form.name|add_class:"form-control" }}
-                    {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors }}</div>{% endif %}
+                    <label for="{{ form.name.id_for_label }}" class="form-label fw-bold">Product Name</label>
+                    {{ form.name}}
+                    {% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors }}</div>{% endif %}
                 </div>
                 <div class="col-md-6">
-                    <label for="{{ form.brand_name.id_for_label }}" class="form-label">Brand</label>
-                    {{ form.brand_name|add_class:"form-select" }}
-                    {% if form.brand_name.errors %}<div class="text-danger small">{{ form.brand_name.errors }}</div>{% endif %}
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
-                {{ form.description|add_class:"form-control" }}
-                {% if form.description.errors %}<div class="text-danger small">{{ form.description.errors }}</div>{% endif %}
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label for="{{ form.price.id_for_label }}" class="form-label">Price</label>
-                    {{ form.price|add_class:"form-control" }}
-                    {% if form.price.errors %}<div class="text-danger small">{{ form.price.errors }}</div>{% endif %}
-                </div>
-                <div class="col-md-6">
-                    <label for="{{ form.discount_price.id_for_label }}" class="form-label">Discount Price</label>
-                    {{ form.discount_price|add_class:"form-control" }}
-                    {% if form.discount_price.errors %}<div class="text-danger small">{{ form.discount_price.errors }}</div>{% endif %}
+                    <label for="{{ form.brand_name.id_for_label }}" class="form-label fw-bold">Brand</label>
+                    {{ form.brand_name}}
+                    {% if form.brand_name.errors %}<div class="text-danger small mt-1">{{ form.brand_name.errors }}</div>{% endif %}
                 </div>
             </div>
 
-            <div class="mb-3">
-                <label for="{{ form.tags.id_for_label }}" class="form-label">Tags</label>
-                {{ form.tags|add_class:"form-control" }}
-                <small class="form-text text-muted">{{ form.tags.help_text }}</small>
-                {% if form.tags.errors %}<div class="text-danger small">{{ form.tags.errors }}</div>{% endif %}
+            <div class="mb-4">
+                <label for="{{ form.description.id_for_label }}" class="form-label fw-bold">Description</label>
+                {{ form.description}}
+                {% if form.description.errors %}<div class="text-danger small mt-1">{{ form.description.errors }}</div>{% endif %}
             </div>
 
-            <div class="mb-3">
-                <label for="{{ form.image.id_for_label }}" class="form-label">Product Image</label>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label for="{{ form.price.id_for_label }}" class="form-label fw-bold">Price (₦)</label>
+                    {{ form.price}}
+                    {% if form.price.errors %}<div class="text-danger small mt-1">{{ form.price.errors }}</div>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label for="{{ form.discount_price.id_for_label }}" class="form-label fw-bold">Discount Price (₦) <small class="text-muted">(Optional)</small></label>
+                    {{ form.discount_price }}
+                    {% if form.discount_price.errors %}<div class="text-danger small mt-1">{{ form.discount_price.errors }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label for="{{ form.tags.id_for_label }}" class="form-label fw-bold">Tags</label>
+                {{ form.tags }}
+                <div class="form-text text-muted mt-1">Separate tags with commas (e.g., organic, fresh, dairy). This helps users search for your products better.</div>
+                {% if form.tags.errors %}<div class="text-danger small mt-1">{{ form.tags.errors }}</div>{% endif %}
+            </div>
+
+            <div class="mb-4">
+                <label for="{{ form.image.id_for_label }}" class="form-label fw-bold">Product Image</label>
                 {{ form.image|add_class:"form-control" }}
-                {% if product.image %}
-                    <img src="{{ product.image.url }}" class="img-thumbnail mt-2" style="height: 120px;">
-                {% endif %}
-                {% if form.image.errors %}<div class="text-danger small">{{ form.image.errors }}</div>{% endif %}
+                {% if form.image.errors %}<div class="text-danger small mt-1">{{ form.image.errors }}</div>{% endif %}
+                
+                {# Image Preview Container #}
+                <div id="image-preview-container">
+                    <img id="image-preview" src="#" alt="Image Preview">
+                    <span id="image-preview-placeholder">No image selected</span>
+                </div>
             </div>
 
-            <div class="row mb-3">
+            <div class="row mb-4 align-items-center">
                 <div class="col-md-6">
-                    <label for="{{ form.stock_quantity.id_for_label }}" class="form-label">Stock Quantity</label>
-                    {{ form.stock_quantity|add_class:"form-control" }}
-                    {% if form.stock_quantity.errors %}<div class="text-danger small">{{ form.stock_quantity.errors }}</div>{% endif %}
+                    <label for="{{ form.stock_quantity.id_for_label }}" class="form-label fw-bold">Stock Quantity</label>
+                    {{ form.stock_quantity }}
+                    {% if form.stock_quantity.errors %}<div class="text-danger small mt-1">{{ form.stock_quantity.errors }}</div>{% endif %}
                 </div>
-                <div class="col-md-6 d-flex align-items-center mt-4">
-                    <div class="form-check">
-                        {{ form.is_available }}
-                        <label class="form-check-label ms-2" for="{{ form.is_available.id_for_label }}">Is Available</label>
-                        {% if form.is_available.errors %}<div class="text-danger small">{{ form.is_available.errors }}</div>{% endif %}
+                <div class="col-md-6 mt-md-0 mt-3">
+                    <div class="form-check form-switch pt-4">
+                        {{ form.is_available|add_class:"form-check-input" }}
+                        <label class="form-check-label fw-bold" for="{{ form.is_available.id_for_label }}">Is Available for Sale</label>
+                        {% if form.is_available.errors %}<div class="text-danger small mt-1">{{ form.is_available.errors }}</div>{% endif %}
                     </div>
                 </div>
             </div>
 
-            {# --- START: Category Selection Accordion (ADDED) --- #}
-            <div class="mb-4 border rounded p-3 bg-light">
-                <h6 class="mb-3 fw-bold text-uppercase">Categories</h6>
+            {# --- START: Category Selection Accordion --- #}
+            <div class="mb-4 border rounded-4 p-4 bg-light shadow-sm">
+                <h5 class="mb-3 fw-bold text-uppercase text-dark">Select Category</h5>
                 
                 {% if form.category.errors %}
-                    <div class="text-danger small mb-2">{{ form.category.errors }}</div>
+                    <div class="text-danger small mb-3">{{ form.category.errors }}</div>
                 {% endif %}
 
                 <div class="accordion" id="categoryAccordion">
@@ -166,7 +266,6 @@
                                         type="button" data-bs-toggle="collapse"
                                         data-bs-target="#collapse-{{ parent.slug }}" aria-expanded="false"
                                         aria-controls="collapse-{{ parent.slug }}">
-                                    {# ADDED: Icon for parent category #}
                                     {% if parent.icon %}<i class="{{ parent.icon }}"></i>{% endif %}
                                     {{ parent.name }}
                                 </button>
@@ -177,7 +276,7 @@
                                  data-bs-parent="#categoryAccordion">
                                 <div class="accordion-body ps-4">
                                     {% for subcat in parent.subcategories.all %}
-                                        <div class="category-choice mb-2 p-2 border rounded" data-category-id="{{ subcat.id }}">
+                                        <div class="category-choice mb-2" data-category-id="{{ subcat.id }}">
                                             <input class="form-check-input visually-hidden"
                                                    type="radio"
                                                    name="category" {# IMPORTANT: Name MUST be 'category' to match ProductForm's field #}
@@ -185,7 +284,6 @@
                                                    value="{{ subcat.id }}"
                                                    {% if selected_category_id == subcat.id %}checked{% endif %}>
                                             <label class="form-check-label w-100" for="subcat-{{ subcat.id }}">
-                                                {# ADDED: Icon for subcategory #}
                                                 {% if subcat.icon %}<i class="{{ subcat.icon }}"></i>{% endif %}
                                                 {{ subcat.name }}
                                             </label>
@@ -197,27 +295,20 @@
                     {% endfor %}
                 </div>
             </div>
-            {# --- END: Category Selection Accordion (ADDED) --- #}
+            {# --- END: Category Selection Accordion --- #}
 
-            <div class="d-flex justify-content-between mt-4"> {# Added mt-4 for spacing #}
-                <a href="{% url 'product_detail' product.slug %}" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-success">Save Changes</button>
+            <div class="d-flex justify-content-end gap-3 mt-4">
+                <a href="{% url 'product_list' %}" class="btn btn-outline-secondary btn-lg rounded-pill px-4">Cancel</a>
+                <button type="submit" class="btn btn-success btn-lg rounded-pill px-4">Save Changes</button>
             </div>
         </form>
     </div>
 </div>
 
-{# You likely already have Bootstrap JS in your base.html, so this might be redundant #}
-{# <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> #}
-
-{# --- django-select2 JavaScript --- #}
-{# jQuery is a common dependency for Select2. Ensure it's loaded BEFORE Select2 JS. #}
-{# If your base.html already loads jQuery, you might not need this line #}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-
 {{ form.media.js }} 
 
-{# --- START: JavaScript for clickable categories (ADDED) --- #}
+{# --- START: JavaScript for clickable categories and image preview --- #}
 <script>
     $(document).ready(function() {
         // Function to update visual selection based on checked radio button
@@ -247,8 +338,35 @@
         $('.category-choice input[type="radio"]').on('change', function() {
             updateCategoryVisuals();
         });
+
+        // --- Image Preview Logic ---
+        const imageInput = $('#id_image'); // Assuming your image field id is 'id_image'
+        const imagePreview = $('#image-preview');
+        const imagePreviewPlaceholder = $('#image-preview-placeholder');
+
+        imageInput.on('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.attr('src', e.target.result).show();
+                    imagePreviewPlaceholder.hide();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.hide().attr('src', '#');
+                imagePreviewPlaceholder.show();
+            }
+        });
+
+        // If this is an edit page and there's an existing image, show it on load
+        // This assumes 'product' object is passed to the template on edit view
+        {% if product and product.image %}
+            imagePreview.attr('src', "{{ product.image.url }}").show();
+            imagePreviewPlaceholder.hide();
+        {% endif %}
     });
 </script>
-{# --- END: JavaScript for clickable categories (ADDED) --- #}
+{# --- END: JavaScript for clickable categories and image preview --- #}
 
 {% endblock %}

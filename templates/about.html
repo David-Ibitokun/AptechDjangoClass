@@ -1,50 +1,114 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block title %}About - Sumia{% endblock %}
+
 {% block content %}
+<div class="container py-5 bg-white shadow-sm rounded">
 
-  <div style="max-width: 900px; margin: auto; padding: 40px 20px; background-color: #fff;">
+  <h1 class="display-5 fw-bold text-center text-dark mb-4">
+    Discover <span class="text-primary">Sumia</span>
+  </h1>
 
-    <h1 style="font-size: 2.5rem; color: #2c3e50; margin-bottom: 10px;">
-      About <span class="text-primary">Sumia</span>
-    </h1>
+  <p class="lead text-center mb-5 mx-auto" style="max-width: 800px;">
+    Welcome to Sumia &mdash; your ultimate destination for <strong>quality</strong> and <strong>convenience</strong>! We're dedicated to providing a seamless shopping experience with top-notch products, competitive prices, and swift delivery.
+  </p>
 
-    <p style="margin: 15px 0;">
-      Welcome to <span style="font-weight: bold;" class="text-primary">Sumia</span>, your ultimate destination for quality and convenience!
-      We’re here to bring you a seamless shopping experience with top-notch products, great prices, and fast delivery.
+  <hr class="my-5">
+
+<div class="row gx-lg-5 align-items-center py-5"> {# Added gx-lg-5 for larger gap on large screens, and py-5 for vertical padding #}
+  <div class="col-md-6 mb-4 mb-md-0">
+    <h2 class="h4 fw-bold text-dark mb-3">Our Story</h2>
+    <p class="mb-4">
+      Since our launch in <strong>2020</strong>, Sumia has rapidly grown into a trusted platform for shoppers seeking both trendy and essential items. We carefully curate collections, ranging from <strong>fashion to cutting-edge tech</strong>, to perfectly match your modern lifestyle.
     </p>
+  </div>
+  <div class="col-md-6 d-flex justify-content-center"> {# Use Bootstrap classes for image centering #}
+    {# Removed the extra div with inline style. img-fluid handles responsiveness. #}
+    <img src="{% static 'images/about-us-hero.jpeg' %}" class="img-fluid rounded shadow-lg" alt="Sumia Team Working"> {# shadow-lg for a more prominent shadow #}
+  </div>
+</div>
 
-    <h2 style="font-size: 1.5rem; color: #2c3e50; margin-top: 30px;">Who We Are</h2>
-    <p style="margin: 15px 0;">
-      Since our launch in <strong>2020</strong>, we've grown into a trusted platform for everyday shoppers.
-      From fashion to tech, we curate our collections to meet your lifestyle and needs.
-    </p>
+  <hr class="my-5">
 
-    <h2 style="font-size: 1.5rem; color: #2c3e50; margin-top: 30px;">What We Offer</h2>
-    <ul style="margin: 15px 0 15px 20px;">
-      <li style="margin-bottom: 8px;">Premium, verified products from top suppliers</li>
-      <li style="margin-bottom: 8px;">Fast and secure delivery nationwide</li>
-      <li style="margin-bottom: 8px;">Multiple payment methods</li>
-      <li style="margin-bottom: 8px;">Friendly and reliable customer support</li>
-    </ul>
-
-    <h2 style="font-size: 1.5rem; color: #2c3e50; margin-top: 30px;">Our Promise</h2>
-    <p style="margin: 15px 0;">
-      We’re committed to delivering quality and satisfaction with every order.
-      Our team works round the clock to ensure your shopping is fast, smooth, and secure.
-    </p>
-
-    <h2 style="font-size: 1.5rem; color: #2c3e50; margin-top: 30px;">Connect With Us</h2>
-    <p style="margin: 15px 0;">
-      Join our community online and enjoy exclusive updates and promotions.
-      Follow us on social media or reach out directly for support!
-    </p>
-
-    <h2 style="font-size: 1.5rem; color: #2c3e50; margin-top: 30px;">Need Help?</h2>
-    <p style="margin: 15px 0;">
-      Contact us at <a href="mailto:support@sumia.com" class="text-primary" style="text-decoration: none;">support@sumia.com</a>. We're happy to help!
-    </p>
-
+  <h2 class="h4 fw-bold text-center text-dark mb-4">What Makes Us Stand Out?</h2>
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <ul class="list-unstyled row gy-3 mb-5">
+        <li class="col-lg-6 d-flex align-items-start">
+          <i class="bi bi-patch-check-fill text-success fs-4 me-3"></i>
+          <div>
+            <h5 class="fw-semibold mb-0">Premium & Verified Products</h5>
+            <small class="text-muted">Only the best, sourced from trusted suppliers.</small>
+          </div>
+        </li>
+        <li class="col-lg-6 d-flex align-items-start">
+          <i class="bi bi-truck-flatbed text-success fs-4 me-3"></i>
+          <div>
+            <h5 class="fw-semibold mb-0">Fast, Secure Nationwide Delivery</h5>
+            <small class="text-muted">Your order, delivered quickly and safely to your doorstep.</small>
+          </div>
+        </li>
+        <li class="col-lg-6 d-flex align-items-start">
+          <i class="bi bi-credit-card-fill text-success fs-4 me-3"></i>
+          <div>
+            <h5 class="fw-semibold mb-0">Flexible Payment Options</h5>
+            <small class="text-muted">Convenient and secure ways to pay for your purchases.</small>
+          </div>
+        </li>
+        <li class="col-lg-6 d-flex align-items-start">
+          <i class="bi bi-headset text-success fs-4 me-3"></i>
+          <div>
+            <h5 class="fw-semibold mb-0">Dedicated Customer Support</h5>
+            <small class="text-muted">Friendly, reliable help whenever you need it.</small>
+          </div>
+        </li>
+      </ul>
+    </div>
   </div>
 
+  <hr class="my-5">
+
+  <div class="text-center">
+    <h2 class="h4 fw-bold text-dark mb-3">Our Promise to You</h2>
+    <p class="mb-4 mx-auto" style="max-width: 800px;">
+      At Sumia, your <strong>satisfaction is our priority</strong>. Our dedicated team works tirelessly to ensure your shopping journey is always smooth, swift, and secure, from Browse to delivery.
+    </p>
+    <a href="{% url 'contact' %}" class="btn btn-primary btn-lg shadow-sm">
+      <i class="bi bi-question-circle me-2"></i>Have a Question?
+    </a>
+  </div>
+
+  <hr class="my-5">
+
+  <div class="text-center">
+    <h2 class="h4 fw-bold text-dark mb-3">Connect With Us!</h2>
+    <p class="mb-4">
+      Join the Sumia community! Follow us on social media for the latest trends, exclusive offers, and exciting news.
+    </p>
+    <div class="d-flex justify-content-center gap-3 fs-3">
+      <a href="#" class="text-primary hover-scale" aria-label="Sumia on Facebook"><i class="bi bi-facebook"></i></a>
+      <a href="#" class="text-primary hover-scale" aria-label="Sumia on Instagram"><i class="bi bi-instagram"></i></a>
+      <a href="#" class="text-primary hover-scale" aria-label="Sumia on Twitter"><i class="bi bi-twitter"></i></a>
+      <a href="#" class="text-primary hover-scale" aria-label="Sumia on LinkedIn"><i class="bi bi-linkedin"></i></a>
+    </div>
+    <p class="mt-4 mb-0">
+      Or email us directly at 
+      <a href="mailto:support@sumia.com" class="text-primary text-decoration-none fw-semibold">
+        support@sumia.com
+      </a> for personalized assistance.
+    </p>
+  </div>
+
+</div>
+
+<style>
+  /* Optional: Add some custom CSS for the hover effect on social icons */
+  .hover-scale {
+    transition: transform 0.2s ease-in-out;
+  }
+  .hover-scale:hover {
+    transform: scale(1.15);
+  }
+</style>
 {% endblock %}
