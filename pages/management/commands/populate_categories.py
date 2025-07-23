@@ -53,7 +53,7 @@ class Command(BaseCommand):
                 'Other Phones & Tablets' # Added 'Other'
             ],
             'Electronics': [
-                'Televisions', 'Home Audio', 'Cameras', 'Video Game Consoles', 'Drones',
+                'Televisions', 'Home Audio', 'Cameras', 'Video Game Consoles', 'Drones', 'Fans',
                 'Wearable Technology', 'Generators & Power Solutions', 'Security Cameras & Systems',
                 'DVD & Blu-Ray Players', 'Projectors', 'Home Theatre Systems', 'Digital Cameras',
                 'DSLR Cameras', 'Mirrorless Cameras', 'Action Cameras', 'Camera Accessories',

@@ -1,67 +1,101 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Dashboard{% endblock %}
+
 {% block content %}
-<section class="py-5">
-  <div class="container">
-    <div class="text-center mb-4">
-      <h2 class="fw-bold text-primary">User  Dashboard</h2>
-      <p class="text-muted">Welcome, {{ request.user.first_name }}!</p>
-    </div>
-
-    <div class="card shadow-sm border-0 mb-4">
-      <div class="card-body">
-        <h5 class="card-title">Your Activity</h5>
-        <p class="card-text">Here you can manage your profile, check recent activity, and browse products.</p>
-      </div>
-    
-        <div class="card-body">
-          <h5 class="text-muted">Account Information</h5>
-          <p class="mb-0">Email: {{ request.user.email }}</p>
-          <p class="mb-0">Joined on: {{ request.user.date_joined|date:"F j, Y" }}</p>
-        </div></div>
-    <div class="grid mb-4">
-      
-    <div class="row">
-      <div class="col-md-4 mb-4">
-        <div class="card shadow-sm border-0">
-          <div class="card-body d-flex flex-column">
-            <h5 class="card-title">Manage Profile</h5>
-            <p class="card-text">Update your personal information and change your password.</p>
-            <a href="{% url 'myAccount' %}" class="btn btn-primary">Edit Profile</a>
-          </div>
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold text-primary display-5 mb-3">Welcome, {{ user.first_name|default:"User" }} {{ user.last_name|default:"User" }}!</h2>
+            <p class="lead text-muted">Manage your account, orders, and preferences from here.</p>
         </div>
-      </div>
 
-      <div class="col-md-4 mb-4">
-        <div class="card shadow-sm border-0 h-100">
-          <div class="card-body d-flex flex-column">
-            <h5 class="card-title">Recent Orders</h5>
-            <p class="card-text">View your Wish List</p>
-            <a href="{% url 'wishList' %}" class="btn btn-primary mt-auto">View Orders</a>
-          </div>
-        </div>
-      </div>
+        <div class="row g-4">
+            {# Profile Card #}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-lg border-0 rounded-4 text-center p-4">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <i class="fas fa-user-circle text-primary mb-3" style="font-size: 4rem;"></i>
+                        <h5 class="card-title fw-bold mb-2">My Profile</h5>
+                        <p class="card-text text-muted mb-4">View your personal information.</p>
+                        <a href="{% url 'myProfile' %}" class="btn btn-outline-primary rounded-pill px-4">
+                            Go to Profile <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
 
-      <div class="col-md-4 mb-4">
-        <div class="card shadow-sm border-0 h-100">
-          <div class="card-body d-flex flex-column">
-            <h5 class="card-title">Browse Products</h5>
-            <p class="card-text">Explore our latest products and offers.</p>
-            <a href="{% url 'home' %}" class="btn btn-primary mt-auto">Shop Now</a>
-          </div>
+            {# Orders Card #}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-lg border-0 rounded-4 text-center p-4">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <i class="fas fa-box-open text-success mb-3" style="font-size: 4rem;"></i>
+                        <h5 class="card-title fw-bold mb-2">My Orders</h5>
+                        <p class="card-text text-muted mb-4">Track your recent and past orders.</p>
+                        <a href="{% url 'recent_order' %}" class="btn btn-outline-success rounded-pill px-4">
+                            View Orders <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# Wishlist Card #}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-lg border-0 rounded-4 text-center p-4">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <i class="fas fa-heart mb-3" style="font-size: 4rem; color: #dc3545;"></i>
+                        <h5 class="card-title fw-bold mb-2">My Wishlist</h5>
+                        <p class="card-text text-muted mb-4">See your saved favorite products.</p>
+                        <a href="{% url 'wishlist' %}" class="btn btn-outline-danger rounded-pill px-4">
+                            View Wishlist <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# Cart Card #}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-lg border-0 rounded-4 text-center p-4">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <i class="fas fa-shopping-cart mb-3" style="font-size: 4rem; color: #0dcaf0;"></i>
+                        <h5 class="card-title fw-bold mb-2">My Cart</h5>
+                        <p class="card-text text-muted mb-4">Review items in your shopping cart.</p>
+                        <a href="{% url 'cart' %}" class="btn btn-outline-info rounded-pill px-4">
+                            Go to Cart <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# Continue Shopping Card #}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-lg border-0 rounded-4 text-center p-4">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <i class="fas fa-store text-primary mb-3" style="font-size: 4rem;"></i>
+                        <h5 class="card-title fw-bold mb-2">Continue Shopping</h5>
+                        <p class="card-text text-muted mb-4">Explore more products and categories.</p>
+                        <a href="{% url 'shop' %}" class="btn btn-outline-warning rounded-pill px-4">
+                            Shop Now <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# Logout Card #}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-lg border-0 rounded-4 text-center p-4">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <i class="fas fa-sign-out-alt text-muted mb-3" style="font-size: 4rem;"></i>
+                        <h5 class="card-title fw-bold mb-2">Logout</h5>
+                        <p class="card-text text-muted mb-4">Securely log out of your account.</p>
+                        <a href="{% url 'logout' %}" class="btn btn-outline-secondary rounded-pill px-4">
+                            Logout <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-</div>
-    <div class="card shadow-sm border-0 mt-4">
-      <div class="card-body">
-        <h5 class="card-title">Notifications</h5>
-        <ul class="list-group">
-          <li class="list-group-item">You have 3 new messages.</li>
-          <li class="list-group-item">Your order #12345 has been shipped.</li>
-          <li class="list-group-item">Don't miss our upcoming sale!</li>
-        </ul>
-      </div>
-    </div>
-  </div>
 </section>
 {% endblock %}

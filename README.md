@@ -15,7 +15,7 @@ A responsive Django-based e-commerce web app with full support for product categ
 
 ## 💾 Tech Stack
 
-- **Bzackend:** Django, SQLite/PostgreSQL
+- **Backend:** Django, SQLite/PostgreSQL
 - **Frontend:** Bootstrap 5, HTML, CSS, JS
 - **Admin UI:** Jazzmin
 - **Image Processing:** Pillow
@@ -42,9 +42,12 @@ Visit: [http://127.0.0.1:8000](http://127.0.0.1:8000)
 Include the following in your `requirements.txt`:
 
 ```
-Django>=4.0
-Pillow
-django-jazzmin
+Django>=4.2,<5.0
+pillow>=10.0.0
+django-jazzmin>=2.6.0
+django-widget-tweaks>=1.4.12
+django-taggit>=3.1.0
+django-select2>=8.0
 ```
 
 And add `jazzmin` to `INSTALLED_APPS` before `'django.contrib.admin'`:

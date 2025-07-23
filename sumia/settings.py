@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'pages',
     'taggit',
     'django.contrib.humanize',
+    'django_select2',
 ]
 
 MIDDLEWARE = [
@@ -67,6 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'pages.context_processors.categories_for_search',
             ],
         },
     },

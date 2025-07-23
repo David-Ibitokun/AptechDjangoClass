@@ -4,96 +4,280 @@
 {% block title %}Add New Product{% endblock %}
 
 {% block content %}
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+{# --- START: Inline CSS for clickable categories and general styling enhancements --- #}
+<style>
+    /* Custom Styles for Clickable Category Choices */
 
-<div class="container py-4">
-    <div class="card shadow">
-        <div class="card-header bg-warning text-dark fw-bold">Add New Product</div>
+    /* Hide the actual radio button */
+    .visually-hidden {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        padding: 0 !important;
+        margin: -1px !important;
+        overflow: hidden !important;
+        clip: rect(0, 0, 0, 0) !important;
+        white-space: nowrap !important;
+        border: 0 !important;
+    }
+
+    /* Style for the clickable category choice container */
+    .category-choice {
+        cursor: pointer;
+        background-color: #f8f9fa; /* Light background */
+        border: 1px solid #dee2e6; /* Light gray border */
+        border-radius: .5rem; /* More rounded corners */
+        transition: all 0.2s ease-in-out; /* Smooth transition for hover/selection */
+        display: flex; /* Use flex for icon and text alignment */
+        align-items: center; /* Vertically center icon and text */
+        padding: .75rem 1rem; /* More padding inside the clickable area */
+        font-size: 0.95rem; /* Slightly larger font */
+        color: #343a40; /* Darker text color */
+    }
+
+    /* Hover effect */
+    .category-choice:hover {
+        background-color: #e9ecef; /* Slightly darker background on hover */
+        border-color: #ffc43f; /* Blue border on hover */
+        box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .25); /* More prominent subtle shadow on hover */
+    }
+
+    /* Style for the selected category */
+    .category-choice.selected {
+        background-color: #d1e7dd; /* Light green background for selected */
+        border-color: #198754; /* Green border for selected */
+        font-weight: bold; /* Make text bold for selected */
+        color: #0f5132; /* Darker text for selected */
+        box-shadow: 0 0 0 .25rem rgba(25, 135, 84, .25); /* Green shadow for selected */
+    }
+
+    /* Ensure the label takes full width for clicking */
+    .category-choice .form-check-label {
+        cursor: pointer; /* Keep cursor pointer on label too */
+        flex-grow: 1; /* Allow label to take available space */
+    }
+
+    /* Added style for icons for better alignment */
+    .accordion-button i,
+    .category-choice i {
+        margin-right: 12px; /* More space between icon and text */
+        width: 1.5em; /* Ensure consistent width for icons */
+        text-align: center; /* Center icon within its allocated space */
+        color: #6c757d; /* Default icon color */
+    }
+
+    /* Color for selected category icons */
+    .category-choice.selected i {
+        color: #198754; /* Green icon for selected */
+    }
+
+    /* Styling for accordion headers */
+    .accordion-button {
+        background-color: #f0f2f5; /* Slightly different background for accordion header */
+        font-weight: bold;
+        color: #343a40;
+        border-radius: .5rem; /* Rounded corners for accordion button */
+    }
+    .accordion-item {
+        border: none; /* Remove default accordion item borders */
+        margin-bottom: 0.5rem; /* Space between accordion items */
+        border-radius: .5rem; /* Rounded corners for accordion item */
+        overflow: hidden; /* Ensure rounded corners apply correctly */
+    }
+    .accordion-body {
+        background-color: #ffffff; /* White background for accordion body */
+        border-top: 1px solid #e9ecef; /* Light border at the top of the body */
+    }
+    .accordion-button:not(.collapsed) {
+        background-color: #e2e6ea; /* Slightly darker when open */
+        color: #ffc43f; /* Blue text when open */
+        box-shadow: inset 0 -1px 0 rgba(0,0,0,.125);
+    }
+    .accordion-button:not(.collapsed) i {
+        color: #ffc43f; /* Blue icon when open */
+    }
+
+    /* Form control specific styling */
+    .form-control, .form-select {
+        border-radius: .5rem; /* Consistent rounded corners */
+        padding: .75rem 1rem; /* More padding */
+        border: 1px solid #ced4da; /* Standard border */
+        box-shadow: inset 0 1px 2px rgba(0,0,0,.075); /* Subtle inner shadow */
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 .25rem rgba(13,110,253,.25);
+    }
+
+    /* Checkbox styling */
+    .form-check-input:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+
+    /* Image preview specific styles */
+    #image-preview-container {
+        border: 2px dashed #ced4da;
+        border-radius: .5rem;
+        min-height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        margin-top: 10px;
+        background-color: #f8f9fa;
+    }
+    #image-preview {
+        max-width: 100%;
+        max-height: 150px;
+        object-fit: contain; /* Ensures the entire image is visible */
+        display: none; /* Hidden by default until an image is loaded */
+    }
+    #image-preview-placeholder {
+        color: #6c757d;
+        font-style: italic;
+    }
+</style>
+{# --- END: Inline CSS for clickable categories and general styling enhancements --- #}
+
+{{ form.media.css }} 
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-primary display-5 mb-3">Your Vendor Dashboard</h2>
+        <p class="lead text-muted">Hello, <span class="fw-semibold text-dark">{{ request.user.first_name|default:"Vendor" }}</span>! Seamlessly manage your product listings and inventory here.</p>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="mb-5 text-center d-flex flex-wrap justify-content-center gap-3">
+        <a href="{% url 'add_product' %}" class="btn btn-primary btn-lg rounded-pill shadow-sm">
+            <i class="fas fa-plus-circle me-2"></i> Add New Product
+        </a>
+        <a href="{% url 'product_list' %}" class="btn btn-outline-secondary btn-lg rounded-pill shadow-sm">
+            <i class="fas fa-boxes me-2"></i> Edit My Products
+        </a>
+        <a href="{% url 'vendor_orders' %}" class="btn btn-outline-info btn-lg rounded-pill shadow-sm">
+            <i class="fas fa-receipt me-2"></i> My Orders
+        </a>
+    </div>
+
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white fw-bold py-3 px-4 rounded-top-4">
+            <h5 class="text-white mb-0">Add New Product</h5>
+        </div>
         <form method="post" enctype="multipart/form-data" class="p-4">
             {% csrf_token %}
 
-            <div class="row mb-3">
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger rounded-3" role="alert">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="row mb-4">
                 <div class="col-md-6">
-                    {{ form.name.label_tag }}
+                    <label for="{{ form.name.id_for_label }}" class="form-label fw-bold">Product Name</label>
                     {{ form.name }}
+                    {% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors }}</div>{% endif %}
                 </div>
                 <div class="col-md-6">
-                    {# CHANGE THIS LINE: from form.brand to form.brand_name #}
-                    {{ form.brand_name.label_tag }}
+                    <label for="{{ form.brand_name.id_for_label }}" class="form-label fw-bold">Brand Name</label>
                     {{ form.brand_name }}
+                    {% if form.brand_name.errors %}<div class="text-danger small mt-1">{{ form.brand_name.errors }}</div>{% endif %}
                 </div>
             </div>
 
-            <div class="mb-3">
-                {{ form.description.label_tag }}
+            <div class="mb-4">
+                <label for="{{ form.description.id_for_label }}" class="form-label fw-bold">Description</label>
                 {{ form.description }}
+                {% if form.description.errors %}<div class="text-danger small mt-1">{{ form.description.errors }}</div>{% endif %}
             </div>
 
-            <div class="row mb-3">
+            <div class="row mb-4">
                 <div class="col-md-6">
-                    {{ form.price.label_tag }}
+                    <label for="{{ form.price.id_for_label }}" class="form-label fw-bold">Price (₦)</label>
                     {{ form.price }}
+                    {% if form.price.errors %}<div class="text-danger small mt-1">{{ form.price.errors }}</div>{% endif %}
                 </div>
                 <div class="col-md-6">
-                    {{ form.discount_price.label_tag }}
+                    <label for="{{ form.discount_price.id_for_label }}" class="form-label fw-bold">Discount Price (₦) <small class="text-muted">(Optional)</small></label>
                     {{ form.discount_price }}
+                    {% if form.discount_price.errors %}<div class="text-danger small mt-1">{{ form.discount_price.errors }}</div>{% endif %}
                 </div>
             </div>
 
-            <div class="mb-3">
-                {{ form.tags.label_tag }}
+            <div class="mb-4 container-fluid">
+                <label for="{{ form.tags.id_for_label }}" class="form-label fw-bold">Tags</label>
                 {{ form.tags }}
-                <small class="form-text text-muted">Separate tags with commas.</small>
+                <div class="form-text text-muted mt-1">Separate tags with commas (e.g., organic, fresh, dairy). This helps users search for your products better.</div>
+                {% if form.tags.errors %}<div class="text-danger small mt-1">{{ form.tags.errors }}</div>{% endif %}
             </div>
 
-            <div class="mb-3">
-                {{ form.image.label_tag }}
+            <div class="mb-4">
+                <label for="{{ form.image.id_for_label }}" class="form-label fw-bold">Product Image</label>
                 {{ form.image }}
+                {% if form.image.errors %}<div class="text-danger small mt-1">{{ form.image.errors }}</div>{% endif %}
+                
+                {# Image Preview Container #}
+                <div id="image-preview-container">
+                    <img id="image-preview" src="#" alt="Image Preview">
+                    <span id="image-preview-placeholder">No image selected</span>
+                </div>
             </div>
 
-            <div class="row mb-3">
+            <div class="row mb-4 align-items-center">
                 <div class="col-md-6">
-                    {# CHANGE THIS LINE: from form.stock to form.stock_quantity #}
-                    {{ form.stock_quantity.label_tag }}
+                    <label for="{{ form.stock_quantity.id_for_label }}" class="form-label fw-bold">Stock Quantity</label>
                     {{ form.stock_quantity }}
+                    {% if form.stock_quantity.errors %}<div class="text-danger small mt-1">{{ form.stock_quantity.errors }}</div>{% endif %}
                 </div>
-                <div class="col-md-6 d-flex align-items-center">
-                    {# Assuming form.is_available is a CheckboxInput #}
-                    {{ form.is_available }} &nbsp;
-                    <label class="form-check-label" for="{{ form.is_available.id_for_label }}">Is available</label>
+                <div class="col-md-6 mt-md-0 mt-3">
+                    <div class="form-check form-switch pt-4">
+                        {{ form.is_available }}
+                        <label class="form-check-label fw-bold" for="{{ form.is_available.id_for_label }}">Is Available for Sale</label>
+                        {% if form.is_available.errors %}<div class="text-danger small mt-1">{{ form.is_available.errors }}</div>{% endif %}
+                    </div>
                 </div>
             </div>
 
-            {# ... rest of your template ... #}
-
-            <div class="mb-4 border rounded p-3 bg-light">
-                <h6 class="mb-3 fw-bold text-uppercase">Categories</h6>
+            <div class="mb-4 border rounded-4 p-4 bg-light shadow-sm">
+                <h5 class="mb-3 fw-bold text-uppercase text-dark">Select Category</h5>
+                
+                {% if form.category.errors %}
+                    <div class="text-danger small mb-3">{{ form.category.errors }}</div>
+                {% endif %}
 
                 <div class="accordion" id="categoryAccordion">
-                    {# This part should be fine as it dynamically creates based on your context #}
                     {% for parent in top_level_categories %}
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="heading-{{ parent.slug }}">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                <button class="accordion-button {% if selected_parent_id == parent.id %}show{% else %}collapsed{% endif %}"
+                                        type="button" data-bs-toggle="collapse"
                                         data-bs-target="#collapse-{{ parent.slug }}" aria-expanded="false"
                                         aria-controls="collapse-{{ parent.slug }}">
+                                    {% if parent.icon %}<i class="{{ parent.icon }}"></i>{% endif %}
                                     {{ parent.name }}
                                 </button>
                             </h2>
                             <div id="collapse-{{ parent.slug }}"
-                                 class="accordion-collapse collapse {% if selected_category and selected_category.parent == parent %}show{% endif %}"
+                                 class="accordion-collapse collapse {% if selected_parent_id == parent.id %}show{% endif %}"
                                  aria-labelledby="heading-{{ parent.slug }}"
                                  data-bs-parent="#categoryAccordion">
                                 <div class="accordion-body ps-4">
                                     {% for subcat in parent.subcategories.all %}
-                                        <div class="form-check">
-                                            <input class="form-check-input"
+                                        <div class="category-choice mb-2" data-category-id="{{ subcat.id }}">
+                                            <input class="form-check-input visually-hidden"
                                                    type="radio"
-                                                   name="category" {# This name 'category' corresponds to form.category.widget.name #}
+                                                   name="category"
                                                    id="subcat-{{ subcat.id }}"
                                                    value="{{ subcat.id }}"
-                                                   {% if selected_category and selected_category.id == subcat.id %}checked{% endif %}>
-                                            <label class="form-check-label" for="subcat-{{ subcat.id }}">{{ subcat.name }}</label>
+                                                   {% if selected_category_id == subcat.id %}checked{% endif %}>
+                                            <label class="form-check-label w-100" for="subcat-{{ subcat.id }}">
+                                                {% if subcat.icon %}<i class="{{ subcat.icon }}"></i>{% endif %}
+                                                {{ subcat.name }}
+                                            </label>
                                         </div>
                                     {% endfor %}
                                 </div>
@@ -103,13 +287,77 @@
                 </div>
             </div>
 
-            <div class="d-flex justify-content-end gap-2">
-                <button type="submit" class="btn btn-success">Add Product</button>
-                <a href="{% url 'vendor_dashboard' %}" class="btn btn-secondary">Cancel</a>
+            <div class="d-flex justify-content-end gap-3 mt-4">
+                <a href="{% url 'product_list' %}" class="btn btn-outline-secondary btn-lg rounded-pill px-4">Cancel</a>
+                <button type="submit" class="btn btn-primary btn-lg rounded-pill px-4">Add Product</button>
             </div>
+
         </form>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+{{ form.media.js }} 
+
+{# --- START: JavaScript for clickable categories and image preview --- #}
+<script>
+    $(document).ready(function() {
+        // Function to update visual selection based on checked radio button
+        function updateCategoryVisuals() {
+            // Remove 'selected' class from all category choices
+            $('.category-choice').removeClass('selected');
+            // Add 'selected' class to the parent div of the currently checked radio
+            $('.category-choice input[type="radio"]:checked').closest('.category-choice').addClass('selected');
+        }
+
+        // Initial update when the page loads (useful for edit product or form re-submission)
+        updateCategoryVisuals();
+
+        // Handle clicks on the custom styled category-choice divs
+        $('.category-choice').on('click', function() {
+            var $this = $(this);
+            var radioId = $this.data('category-id'); // Get the category ID from the data attribute
+
+            // Find the corresponding hidden radio button and programmatically check it
+            $('#subcat-' + radioId).prop('checked', true);
+
+            // Update the visual selection
+            updateCategoryVisuals();
+        });
+
+        // Optional: Also handle direct changes to the radio buttons (e.g., if navigated by keyboard)
+        $('.category-choice input[type="radio"]').on('change', function() {
+            updateCategoryVisuals();
+        });
+
+        // --- Image Preview Logic ---
+        const imageInput = $('#id_image'); // Assuming your image field id is 'id_image'
+        const imagePreview = $('#image-preview');
+        const imagePreviewPlaceholder = $('#image-preview-placeholder');
+
+        imageInput.on('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.attr('src', e.target.result).show();
+                    imagePreviewPlaceholder.hide();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.hide().attr('src', '#');
+                imagePreviewPlaceholder.show();
+            }
+        });
+
+        // If this is an edit page and there's an existing image, show it on load
+        // This assumes 'product' object is passed to the template on edit view
+        {% if product and product.image %}
+            imagePreview.attr('src', "{{ product.image.url }}").show();
+            imagePreviewPlaceholder.hide();
+        {% endif %}
+    });
+</script>
+{# --- END: JavaScript for clickable categories and image preview --- #}
+
 {% endblock %}

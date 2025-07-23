@@ -22,53 +22,131 @@ class Category(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    # NEW FIELD FOR ICON (as you provided)
+    icon = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        help_text="Font Awesome 6 icon class (e.g., 'fa-solid fa-laptop'). Auto-assigned if empty."
+    )
 
     class Meta:
         verbose_name_plural = 'Categories'
         ordering = ['name']
 
+    # Define a mapping of category keywords to Font Awesome icons
+    # These are Font Awesome 6 classes (fa-solid, fa-brands, etc.)
+    CATEGORY_ICON_MAP = {
+        'phones': 'fa-solid fa-mobile-alt',
+        'tablets': 'fa-solid fa-tablet-alt',
+        'electronics': 'fa-solid fa-tv',
+        'computing': 'fa-solid fa-laptop',
+        'laptops': 'fa-solid fa-laptop',
+        'desktops': 'fa-solid fa-desktop',
+        'fashion': 'fa-solid fa-shirt',
+        'clothing': 'fa-solid fa-shirt',
+        'shoes': 'fa-solid fa-shoe-prints',
+        'beauty': 'fa-solid fa-spa',
+        'health': 'fa-solid fa-heart-pulse',
+        'home': 'fa-solid fa-house',
+        'kitchen': 'fa-solid fa-blender',
+        'baby': 'fa-solid fa-baby',
+        'kids': 'fa-solid fa-child',
+        'toys': 'fa-solid fa-robot', # Changed from dinosaur for more general toy
+        'sports': 'fa-solid fa-dumbbell',
+        'fitness': 'fa-solid fa-running',
+        'automotive': 'fa-solid fa-car',
+        'motorcycles': 'fa-solid fa-motorcycle',
+        'books': 'fa-solid fa-book',
+        'media': 'fa-solid fa-compact-disc',
+        'gaming': 'fa-solid fa-gamepad',
+        'groceries': 'fa-solid fa-basket-shopping',
+        'food': 'fa-solid fa-apple-whole',
+        'office': 'fa-solid fa-briefcase',
+        'school': 'fa-solid fa-pencil-alt',
+        'arts': 'fa-solid fa-palette',
+        'crafts': 'fa-solid fa-scissors',
+        'travel': 'fa-solid fa-suitcase-rolling',
+        'luggage': 'fa-solid fa-suitcase',
+        'pets': 'fa-solid fa-paw',
+        'industrial': 'fa-solid fa-industry',
+        'scientific': 'fa-solid fa-flask',
+        'renewable': 'fa-solid fa-solar-panel',
+        'solar': 'fa-solid fa-sun',
+        'power': 'fa-solid fa-bolt',
+        # Add more specific mappings if needed for subcategories
+        'smartphones': 'fa-solid fa-mobile-alt',
+        'tablets': 'fa-solid fa-tablet-alt',
+        'televisions': 'fa-solid fa-tv',
+        'cameras': 'fa-solid fa-camera',
+        'printers': 'fa-solid fa-print',
+        'fragrances': 'fa-solid fa-spray-can',
+        'skincare': 'fa-solid fa-face-mask',
+        'cookware': 'fa-solid fa-鍋', # Using a more specific unicode character for pot
+        'appliances': 'fa-solid fa-fan', # General appliance
+        'diapers': 'fa-solid fa-baby-carriage',
+        'strollers': 'fa-solid fa-baby-carriage',
+        'consoles': 'fa-solid fa-gamepad',
+        'stationery': 'fa-solid fa-pen-fancy',
+        'suitcases': 'fa-solid fa-suitcase-rolling',
+        'dog food': 'fa-solid fa-dog',
+        'cat food': 'fa-solid fa-cat',
+        'test instruments': 'fa-solid fa-microscope',
+        'power tools': 'fa-solid fa-screwdriver-wrench',
+        'inverters': 'fa-solid fa-charging-station',
+        'batteries': 'fa-solid fa-battery-full',
+    }
+    DEFAULT_ICON = 'fa-solid fa-tag' # Fallback icon
+
     def save(self, *args, **kwargs):
         """
-        Custom save method to auto-generate a unique slug from the category name.
-        If a slug already exists, it appends a number to ensure uniqueness.
+        Custom save method to auto-generate a unique slug from the category name
+        and to auto-assign a Font Awesome icon if one is not already set.
         """
-        if not self.slug: # Only generate slug if it's not already set
+        # --- Slug Generation Logic (Existing) ---
+        if not self.slug:
             original_slug = slugify(self.name)
             queryset = Category.objects.all()
-
-            # Exclude the current instance if it's an update, to avoid self-collision checks
             if self.pk:
                 queryset = queryset.exclude(pk=self.pk)
-
-            # Check for existing slugs and append a number if necessary
             unique_slug = original_slug
             num = 1
             while queryset.filter(slug=unique_slug).exists():
                 unique_slug = f"{original_slug}-{num}"
                 num += 1
             self.slug = unique_slug
+        
+        # --- Icon Assignment Logic (NEW) ---
+        if not self.icon: # Only assign if the icon field is currently empty
+            category_name_lower = self.name.lower()
+            assigned_icon = None
+
+            # Check for direct matches or strong keyword matches
+            for keyword, icon_class in self.CATEGORY_ICON_MAP.items():
+                if keyword in category_name_lower:
+                    assigned_icon = icon_class
+                    break # Found a match, stop searching
+
+            if assigned_icon:
+                self.icon = assigned_icon
+            else:
+                self.icon = self.DEFAULT_ICON # Assign default if no specific match
+
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        # Ensure you have a 'category_detail' URL pattern defined in your urls.py
         return reverse('category_detail', kwargs={'slug': self.slug})
 
     def __str__(self):
         if self.parent:
-            # Displays as "Parent Category > Child Category"
             return f"{self.parent.name} > {self.name}"
-        return self.name # Displays as "Main Category"
+        return self.name
 
     def get_ancestors(self):
-        """
-        Returns a list of all parent categories leading up to this category,
-        ordered from top-level down to the direct parent.
-        """
         ancestors = []
         current = self
         while current.parent:
-            ancestors.insert(0, current.parent) # Insert at the beginning to maintain order
+            ancestors.insert(0, current.parent)
             current = current.parent
         return ancestors
 
@@ -84,14 +162,11 @@ class Brand(models.Model):
         ordering = ['name']
 
     def save(self, *args, **kwargs):
-        # Apply the same unique slug generation logic here for Brand
         if not self.slug:
             original_slug = slugify(self.name)
             queryset = Brand.objects.all()
-
             if self.pk:
                 queryset = queryset.exclude(pk=self.pk)
-
             unique_slug = original_slug
             num = 1
             while queryset.filter(slug=unique_slug).exists():
@@ -119,12 +194,11 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_products')
 
-    # CHANGED: ForeignKey for single category
     category = models.ForeignKey(
         Category,
-        on_delete=models.SET_NULL, # If a category is deleted, set product's category to NULL
-        null=True,                 # Allow category to be null in DB
-        blank=True,                # Allow category to be empty in forms
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name='products_in_category'
     )
 
@@ -135,14 +209,11 @@ class Product(models.Model):
         ordering = ['-created_at']
 
     def save(self, *args, **kwargs):
-        # Apply the same unique slug generation logic here for Product
         if not self.slug:
             original_slug = slugify(self.name)
             queryset = Product.objects.all()
-
             if self.pk:
                 queryset = queryset.exclude(pk=self.pk)
-
             unique_slug = original_slug
             num = 1
             while queryset.filter(slug=unique_slug).exists():
