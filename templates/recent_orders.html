@@ -1,73 +1,85 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanize %} {# Load humanize for intcomma filter #}
 
 {% block title %}Your Recent Orders - Sumia{% endblock %}
 
 {% block content %}
 <section class="recent-orders-section py-5 bg-light">
-  <div class="container">
-    <div class="text-center mb-5">
-      <h1 class="display-4 fw-bold text-primary mb-2">Your Recent Orders</h1>
-      <p class="lead text-muted">Here's a summary of your latest purchases.</p>
-    </div>
+    <div class="container">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb bg-white px-3 py-2 rounded-pill shadow-sm">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none text-primary">Home</a></li>
+                <li class="breadcrumb-item active text-muted" aria-current="page">My Orders</li>
+            </ol>
+        </nav>
 
-    <div class="card shadow-sm border-0 p-3">
-      <div class="card-body">
-        {% if orders %}
-          <div class="table-responsive">
-            <table class="table table-hover align-middle">
-              <thead class="table-light">
-                <tr>
-                  <th scope="col">Order ID</th>
-                  <th scope="col">Date</th>
-                  <th scope="col">Total</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for order in orders %}
-                <tr>
-                  <td>#{{ order.id }}</td>
-                  <td>{{ order.order_date|date:"M d, Y H:i" }}</td>
-                  <td>₦{{ order.total_amount|floatformat:2 }}</td>
-                  <td>
-                    {% if order.status == 'pending' %}
-                      <span class="badge bg-warning text-dark">{{ order.status|capfirst }}</span>
-                    {% elif order.status == 'shipped' %}
-                      <span class="badge bg-info">{{ order.status|capfirst }}</span>
-                    {% elif order.status == 'delivered' %}
-                      <span class="badge bg-success">{{ order.status|capfirst }}</span>
-                    {% elif order.status == 'cancelled' %}
-                      <span class="badge bg-danger">{{ order.status|capfirst }}</span>
-                    {% else %}
-                      <span class="badge bg-secondary">{{ order.status|capfirst }}</span>
-                    {% endif %}
-                  </td>
-                  <td>
-                    {# Assuming you have an 'order_detail' URL pattern #}
-                    <a href="{% url 'order_detail' order.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        {% else %}
-          <div class="alert alert-info text-center" role="alert">
-            <h4 class="alert-heading">No Recent Orders Found!</h4>
-            <p>It looks like you haven't placed any orders yet.</p>
-            <hr>
-            <p class="mb-0">Start exploring our amazing products now!</p>
-            <a href="{% url 'home' %}" class="btn btn-primary mt-3">Start Shopping</a>
-          </div>
-        {% endif %}
-      </div>
-    </div>
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary mb-3">Your Recent Orders</h1>
+            <p class="lead text-muted">Here's a summary of your latest purchases.</p>
+        </div>
 
-    <div class="text-center mt-5">
-      <a href="{% url 'user_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+        <div class="card shadow-lg border-0 rounded-4 p-4">
+            <div class="card-body">
+                {% if orders %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle table-striped">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col" class="text-nowrap">Order ID</th>
+                                    <th scope="col" class="text-nowrap">Date</th>
+                                    <th scope="col" class="text-nowrap">Total</th>
+                                    <th scope="col" class="text-nowrap">Status</th>
+                                    <th scope="col" class="text-nowrap">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <td class="fw-bold text-primary">#{{ order.id }}</td>
+                                    <td>{{ order.created_at|date:"M d, Y H:i" }}</td> {# Corrected to created_at #}
+                                    <td>₦{{ order.total_price|intcomma }}</td> {# Corrected to total_price #}
+                                    <td>
+                                        {% if order.status == 'pending' %}
+                                            <span class="badge bg-warning text-dark">{{ order.status|capfirst }}</span>
+                                        {% elif order.status == 'shipped' %}
+                                            <span class="badge bg-info">{{ order.status|capfirst }}</span>
+                                        {% elif order.status == 'delivered' %}
+                                            <span class="badge bg-success">{{ order.status|capfirst }}</span>
+                                        {% elif order.status == 'cancelled' %}
+                                            <span class="badge bg-danger">{{ order.status|capfirst }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ order.status|capfirst }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'order_detail' order.order_number %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                            View Details <i class="fas fa-arrow-right ms-1"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info text-center py-4 my-4 rounded-3 shadow-sm" role="alert">
+                        <h4 class="alert-heading"><i class="fas fa-info-circle me-2"></i> No Recent Orders Found!</h4>
+                        <p>It looks like you haven't placed any orders yet.</p>
+                        <hr>
+                        <p class="mb-0">Start exploring our amazing products now!</p>
+                        <a href="{% url 'shop' %}" class="btn btn-primary mt-3 rounded-pill">Start Shopping</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <a href="{% url 'user_dashboard' %}" class="btn btn-secondary btn-lg rounded-pill px-4">
+                <i class="fas fa-tachometer-alt me-2"></i> Back to Dashboard
+            </a>
+        </div>
     </div>
-  </div>
 </section>
 {% endblock %}

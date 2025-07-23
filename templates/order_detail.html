@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Vendor Order #{{ order.id }}{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb bg-white px-3 py-2 rounded-pill shadow-sm">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none text-primary">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'user_dashboard' %}" class="text-decoration-none text-primary">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'vendor_orders' %}" class="text-decoration-none text-primary">My Customer Orders</a></li>
+                <li class="breadcrumb-item active text-muted" aria-current="page">Order #{{ order.id }}</li>
+            </ol>
+        </nav>
+
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary mb-3">Order #{{ order.id }} Details</h1>
+            <p class="lead text-muted">Details for order placed by {{ order.user.get_full_name|default:order.user.username }} on {{ order.created_at|date:"M d, Y H:i" }}.</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Vendor's Items in Order -->
+            <div class="col-lg-8">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-header bg-primary text-white fw-bold py-3 px-4 rounded-top-4">
+                        <h5 class="mb-0"><i class="fas fa-boxes me-2"></i> My Products in This Order</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        {% if vendor_order_items %}
+                            <ul class="list-group list-group-flush mb-4">
+                                {% for item in vendor_order_items %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-0">
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ item.product.image.url|default:'https://placehold.co/60x60/cccccc/333333?text=No+Img' }}" 
+                                                 alt="{{ item.product.name }}" class="rounded-3 me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                            <div>
+                                                <h6 class="mb-0 fw-bold">{{ item.product.name }}</h6>
+                                                <small class="text-muted">{{ item.quantity }} x ₦{{ item.price_at_purchase|intcomma }}</small>
+                                            </div>
+                                        </div>
+                                        <span class="fw-bold">₦{{ item.get_total_price|intcomma }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+
+                            <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                                <h5 class="mb-0 text-dark">Total for My Products:</h5>
+                                <h4 class="mb-0 text-primary fw-bold">₦{{ vendor_total_price|intcomma }}</h4>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info text-center rounded-3" role="alert">
+                                No products from your store found in this order.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer & Shipping Info -->
+            <div class="col-lg-4">
+                <div class="card shadow-lg border-0 rounded-4 mb-4">
+                    <div class="card-header bg-success text-white fw-bold py-3 px-4 rounded-top-4">
+                        <h5 class="mb-0"><i class="fas fa-user-circle me-2"></i> Customer Information</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <p class="mb-1"><strong>Name:</strong> {{ order.user.get_full_name|default:order.user.username }}</p>
+                        <p class="mb-1"><strong>Email:</strong> {{ order.user.email }}</p>
+                        <p class="mb-0"><strong>Phone:</strong> {% if order.user.phone_number %}{{ order.user.phone_number }}{% else %}N/A{% endif %}</p>
+                    </div>
+                </div>
+
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-header bg-info text-white fw-bold py-3 px-4 rounded-top-4">
+                        <h5 class="mb-0"><i class="fas fa-shipping-fast me-2"></i> Shipping Address</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <p class="mb-1">{{ order.address }}</p>
+                        <p class="mb-1">{{ order.city }}{% if order.zip_code %}, {{ order.zip_code }}{% endif %}</p>
+                        <p class="mb-0">{{ order.country }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <a href="{% url 'vendor_orders' %}" class="btn btn-secondary btn-lg rounded-pill px-4">
+                <i class="fas fa-arrow-left me-2"></i> Back to All Customer Orders
+            </a>
+            {# Optional: Add actions like "Update Order Status" here for vendors #}
+        </div>
+    </div>
+</section>
+{% endblock %}

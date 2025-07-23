@@ -1,43 +1,134 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
+
+{% block title %}Checkout{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-  <div class="text-center">
-    <h2 class="text-success">🎉 Order Submitted Successfully!</h2>
-    <p>Thank you, {{ user.username }}! Your order has been placed.</p>
-  </div>
+<section class="py-5 bg-light">
+    <div class="container">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb bg-white px-3 py-2 rounded-pill shadow-sm">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none text-primary">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'cart' %}" class="text-decoration-none text-primary">Cart</a></li>
+                <li class="breadcrumb-item active text-muted" aria-current="page">Checkout</li>
+            </ol>
+        </nav>
 
-  <hr>
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary mb-3">Secure Checkout</h1>
+            <p class="lead text-muted">Please review your order and provide shipping details.</p>
+        </div>
 
-  <h4 class="mt-4">Order Summary</h4>
+        <div class="row g-4">
+            <!-- Order Summary Column -->
+            <div class="col-lg-7">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-header bg-primary text-white fw-bold py-3 px-4 rounded-top-4">
+                        <h5 class="mb-0"><i class="fas fa-shopping-basket me-2"></i> Order Summary</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        {% if cart_items %}
+                            <ul class="list-group list-group-flush mb-4">
+                                {% for item in cart_items %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-0">
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ item.product.image.url|default:'https://placehold.co/60x60/cccccc/333333?text=No+Img' }}" 
+                                                 alt="{{ item.product.name }}" class="rounded-3 me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                            <div>
+                                                <h6 class="mb-0 fw-bold">{{ item.product.name }}</h6>
+                                                <small class="text-muted">{{ item.quantity }} x ₦{{ item.product.get_display_price|intcomma }}</small>
+                                            </div>
+                                        </div>
+                                        <span class="fw-bold">₦{{ item.get_total_price|intcomma }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
 
-  {% if order %}
-  <table class="table table-bordered table-striped mt-3">
-    <thead>
-      <tr>
-        <th>Product</th>
-        <th>Quantity</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in order.orderitem_set.all %}
-      <tr>
-        <td>{{ item.product.name }}</td>
-        <td>{{ item.quantity }}</td>
-      </tr>
-      {% endfor %}
-      <tr>
-        <td class="text-end"><strong>Total:</strong></td>
-        <td><strong>₦{{ order.total_price }}</strong></td>
-      </tr>
-    </tbody>
-  </table>
-  {% else %}
-    <p>No order information found.</p>
-  {% endif %}
+                            <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                                <h5 class="mb-0 text-dark">Total:</h5>
+                                <h4 class="mb-0 text-primary fw-bold">₦{{ total_price|intcomma }}</h4>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-warning text-center rounded-3" role="alert">
+                                Your cart is empty. Please add items before checking out.
+                                <a href="{% url 'home' %}" class="alert-link ms-2">Go to Shop</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
 
-  <div class="text-center mt-4">
-    <a href="{% url 'home' %}" class="btn btn-primary">Continue Shopping</a>
-  </div>
-</div>
+            <!-- Shipping & Payment Column -->
+            <div class="col-lg-5">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-header bg-success text-white fw-bold py-3 px-4 rounded-top-4">
+                        <h5 class="mb-0"><i class="fas fa-truck me-2"></i> Shipping & Payment</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="post">
+                            {% csrf_token %}
+
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-3" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+
+                            <h6 class="fw-bold mb-3 text-dark">Shipping Information</h6>
+                            <div class="mb-3">
+                                <label for="id_address" class="form-label">Address</label>
+                                <input type="text" class="form-control rounded-pill" id="id_address" name="address" 
+                                       value="{{ request.user.address|default:'' }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_city" class="form-label">City</label>
+                                <input type="text" class="form-control rounded-pill" id="id_city" name="city" 
+                                       value="{{ request.user.city|default:'' }}" required>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <label for="id_zip_code" class="form-label">Zip Code</label>
+                                    <input type="text" class="form-control rounded-pill" id="id_zip_code" name="zip_code" 
+                                           value="{{ request.user.zip_code|default:'' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="id_country" class="form-label">Country</label>
+                                    <input type="text" class="form-control rounded-pill" id="id_country" name="country" 
+                                           value="{{ request.user.country|default:'' }}" required>
+                                </div>
+                            </div>
+
+                            <h6 class="fw-bold mb-3 text-dark">Payment Method</h6>
+                            <div class="mb-4">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="payment_method" id="payment_cod" value="COD" checked>
+                                    <label class="form-check-label" for="payment_cod">
+                                        Cash on Delivery
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="payment_method" id="payment_card" value="Card" disabled>
+                                    <label class="form-check-label text-muted" for="payment_card">
+                                        Credit/Debit Card (Coming Soon)
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold" {% if not cart_items %}disabled{% endif %}>
+                                    <i class="fas fa-check-circle me-2"></i> Place Order
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

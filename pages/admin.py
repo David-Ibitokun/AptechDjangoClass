@@ -121,5 +121,5 @@ class OrderItemAdmin(admin.ModelAdmin):
     raw_id_fields = ('order', 'product')
 
     def get_total(self, obj):
-        return obj.get_total()
+        return obj.get_total_price()
     get_total.short_description = 'Total'
