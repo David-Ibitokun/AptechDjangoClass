@@ -621,7 +621,7 @@ def remove_from_wishlist(request, item_id):
         messages.info(request, f"{product_name} removed from your wishlist.")
     except Exception as e: # Catch any potential errors, though get_object_or_404 handles 404s
         messages.error(request, f"Error removing item from wishlist: {e}")
-    return redirect('wishlist_view')
+    return redirect('wishlist')
 
 
 @login_required(login_url='login') # Corrected: login_url='login'
