@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Order Details - #{{ order.order_number }}{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h1 class="fw-bold text-primary display-5">Order #{{ order.order_number }}</h1>
+      <p class="lead text-muted">Tracking details and items from your order.</p>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="card border-0 shadow rounded-4 p-4">
+          <div class="card-body">
+            <!-- Order Info -->
+            <div class="d-flex justify-content-between flex-wrap mb-4">
+              <div>
+                <p class="mb-1">
+                  <strong class=" condary">Order Date:</strong>
+                  {{ order.created_at|date:"M d, Y H:i" }}
+                </p>
+                <p class="mb-1">
+                  <strong class=" condary">Order Status:</strong>
+                  {% if order.status == 'pending' %}
+                    <span class="badge bg-warning text-dark"><i class="fas fa-hourglass-start me-1"></i>{{ order.get_status_display }}</span>
+                  {% elif order.status == 'processing' %}
+                    <span class="badge bg-info text-dark"><i class="fas fa-cogs me-1"></i>{{ order.get_status_display }}</span>
+                  {% elif order.status == 'shipped' %}
+                    <span class="badge bg-primary"><i class="fas fa-truck me-1"></i>{{ order.get_status_display }}</span>
+                  {% elif order.status == 'delivered' %}
+                    <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>{{ order.get_status_display }}</span>
+                  {% elif order.status == 'cancelled' %}
+                    <span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i>{{ order.get_status_display }}</span>
+                  {% else %}
+                    <span class="badge bg-secondary">{{ order.get_status_display }}</span>
+                  {% endif %}
+                </p>
+                <p class="mb-1">
+                  <strong class=" condary">Payment Status:</strong>
+                  {% if order.is_paid %}
+                    <span class="badge bg-success"><i class="fas fa-money-check-alt me-1"></i>Paid</span>
+                  {% else %}
+                    <span class="badge bg-warning text-dark"><i class="fas fa-exclamation-circle me-1"></i>Unpaid</span>
+                  {% endif %}
+                </p>
+              </div>
+              <div class="text-end">
+                <p class="mb-1"><strong class=" condary">Total Amount:</strong></p>
+                <h3 class="fw-bold text-primary">₦{{ order.total_price|intcomma }}</h3>
+              </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- Shipping Info -->
+            <div class="mb-4">
+              <h5 class="fw-bold mb-3"><i class="fas fa-map-marker-alt me-2"></i>Shipping Address</h5>
+              <p class="mb-1">{{ order.address }}</p>
+              <p class="mb-1">{{ order.city }}, {{ order.zip_code }}</p>
+              <p class="mb-1">{{ order.country }}</p>
+              <p class="mb-0"><strong class=" condary">Phone:</strong> {{ order.phone_number }}</p>
+            </div>
+
+            <!-- Payment Method -->
+            <div class="mb-4">
+              <h5 class="fw-bold mb-3"><i class="fas fa-credit-card me-2"></i>Payment Method</h5>
+              <p class="mb-0">{{ order.get_payment_method_display }}</p>
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- Items Table -->
+            <div class="mb-4">
+              <h5 class="fw-bold mb-3"><i class="fas fa-box-open me-2"></i>Items in This Order</h5>
+              <div class="table-responsive">
+                <table class="table table-bordered table-striped align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Product</th>
+                      <th>Quantity</th>
+                      <th>Price</th>
+                      <th>Subtotal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for item in order_items %}
+                    <tr>
+                      <td>
+                        {% if item.product %}
+                          <a href="{% url 'product_detail' item.product.slug %}" class="fw-semibold text-decoration-none text-dark">{{ item.product.name }}</a>
+                        {% else %}
+                          <span class="text-muted fst-italic">Deleted Product</span>
+                        {% endif %}
+                      </td>
+                      <td>{{ item.quantity }}</td>
+                      <td>₦{{ item.price_at_purchase|intcomma }}</td>
+                      <td>₦{{ item.get_total_price|intcomma }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                  <tfoot>
+                    <tr class="table-primary">
+                      <td colspan="3" class="text-end fw-bold">Order Total:</td>
+                      <td class="fw-bold">₦{{ order.total_price|intcomma }}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+
+            <div class="text-center mt-5">
+              <a href="{% url 'recent_order' %}" class="btn btn-outline-primary btn-lg rounded-pill">
+                <i class="fas fa-arrow-left me-2"></i> Back to My Orders
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

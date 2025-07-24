@@ -101,6 +101,10 @@
                                     <input type="text" class="form-control rounded-pill" id="id_country" name="country" 
                                            value="{{ request.user.country|default:'' }}" required>
                                 </div>
+                                <div class="col-md-6">
+                                    <label for="phone_number" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control rounded-pill px-3 py-2" id="phone_number" name="phone_number" value="{{ phone_number }}" placeholder="e.g., +1234567890" required>
+                                </div>
                             </div>
 
                             <h6 class="fw-bold mb-3 text-dark">Payment Method</h6>

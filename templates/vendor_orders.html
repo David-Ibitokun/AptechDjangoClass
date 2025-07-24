@@ -25,6 +25,8 @@
             </a>
         </div>
 
+        
+        
         <!-- Orders List Section -->
         <div class="card shadow-lg border-0 rounded-4">
             <div class="card-body p-4">
@@ -35,7 +37,7 @@
                         <table class="table table-hover table-striped align-middle">
                             <thead class="table-light">
                                 <tr>
-                                    <th scope="col">Order Number</th> {# Changed to Order Number #}
+                                    <th scope="col">Order Number</th>
                                     <th scope="col">Customer</th>
                                     <th scope="col">Items</th>
                                     <th scope="col">Total (₦)</th>
@@ -47,12 +49,18 @@
                             <tbody>
                                 {% for order in orders %}
                                 <tr>
-                                    <th scope="row">#{{ order.order_number }}</th> {# Display order_number #}
-                                    <td>{{ order.user.username|default:"Guest User" }}</td>
+                                    <th scope="row">#{{ order.order_number }}</th>
+                                    <td>
+                                        {# Corrected Line 70 (or similar) #}
+                                        {% if order.user %}
+                                            {{ order.user.get_full_name|default:order.user.username }}
+                                        {% else %}
+                                            Guest User
+                                        {% endif %}
+                                    </td>
                                     <td>
                                         <ul class="list-unstyled mb-0">
                                             {% for item in order.orderitem_set.all %}
-                                                {# Only show items from this vendor's products #}
                                                 {% if item.product.creator == request.user %}
                                                     <li>{{ item.quantity }} x {{ item.product.name|truncatechars:30 }}</li>
                                                 {% endif %}
@@ -67,10 +75,8 @@
                                         {% else %}
                                             <span class="badge bg-warning text-dark py-2 px-3 rounded-pill">Pending Payment</span>
                                         {% endif %}
-                                        {# You could add more status badges here (e.g., Shipped, Delivered) if your Order model has a 'status' field #}
                                     </td>
                                     <td>
-                                        {# CORRECTED LINK: Point to vendor_order_detail using order.order_number #}
                                         <a href="{% url 'vendor_order_detail' order.order_number %}" class="btn btn-sm btn-outline-primary rounded-pill">View Order</a>
                                     </td>
                                 </tr>
@@ -88,6 +94,8 @@
                 {% endif %}
             </div>
         </div>
+    </div>
+</section>
     </div>
 </section>
 {% endblock %}

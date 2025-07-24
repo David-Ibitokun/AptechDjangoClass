@@ -69,8 +69,7 @@
                     <div class="card-body p-4">
                         <p class="mb-1"><strong>Name:</strong> {{ order.user.get_full_name|default:order.user.username }}</p>
                         <p class="mb-1"><strong>Email:</strong> {{ order.user.email }}</p>
-                        <p class="mb-0"><strong>Phone:</strong> {% if order.user.phone_number %}{{ order.user.phone_number }}{% else %}N/A{% endif %}</p>
-                    </div>
+                        </div>
                 </div>
 
                 <div class="card shadow-lg border-0 rounded-4">
@@ -81,6 +80,7 @@
                         <p class="mb-1">{{ order.address }}</p>
                         <p class="mb-1">{{ order.city }}{% if order.zip_code %}, {{ order.zip_code }}{% endif %}</p>
                         <p class="mb-0">{{ order.country }}</p>
+                        <p class="mb-3"><strong>Phone Number:</strong> {{ order.phone_number }}</p> {# <--- NEW: Display Phone Number #}
                     </div>
                 </div>
             </div>
