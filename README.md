@@ -1,74 +1,108 @@
-# 🛒 Django E-Commerce Platform (Jumia-Style)
 
-A responsive Django-based e-commerce web app with full support for product categories, carts, search, wishlist, and a beautiful admin interface using Jazzmin.
+# 🛒 Sumia E-Commerce Platform
+
+Sumia is a modern, responsive Django-based e-commerce web application designed for seamless product browsing, vendor management, category navigation, tag suggestion, and secure checkout.
 
 ## 🚀 Features
 
-- 🔍 Search and filter by parent category
-- 🧭 Breadcrumb navigation
-- 🗂 Hierarchical categories (e.g., Men > T-Shirts)
-- 🛒 Cart with quantity management and stock validation
-- 🖼 Product image uploads with fallback
-- ❤️ Wishlist system
-- 🔐 Login-based cart and wishlist
-- 🛠 Admin dashboard using **Jazzmin**
+- 🔐 User Authentication & Registration
+- 🛍️ Product Browsing by Category & Tags
+- 🏷️ Smart Tag Suggestions with Autocomplete (like hashtags)
+- 🧑‍💻 Vendor Dashboard to Manage Products
+- 📂 Hierarchical Categories with SVG Icons (e.g. Men > T-Shirts)
+- 📦 Cart, Wishlist, and Orders Functionality
+- 🧭 Breadcrumb Navigation
+- 🔎 Search & Filter Products
+- 📧 Email Notifications
+- 📱 Mobile-Responsive Design
+- 🎨 Admin UI Styled with Jazzmin
+- 🖼️ Image Preview Before Upload
+- 🗃️ Tag Management using `django-taggit` + `Select2`
 
-## 💾 Tech Stack
+## 🖼️ Homepage Preview
 
-- **Backend:** Django, SQLite/PostgreSQL
-- **Frontend:** Bootstrap 5, HTML, CSS, JS
-- **Admin UI:** Jazzmin
-- **Image Processing:** Pillow
+The homepage includes:
+
+- Hero Banner
+- Sidebar with Parent Categories (hover to view subcategories)
+- Grid of Featured Products
+- Interactive Tags (#summer, #fashion, etc.)
+- Smooth Add to Cart / Wishlist interactions
+
+## 🛠️ Technologies Used
+
+- **Backend:** Django, Django ORM
+- **Frontend:** HTML5, CSS3, Bootstrap 5, Select2
+- **Admin Theme:** [Jazzmin](https://github.com/farridav/django-jazzmin)
+- **Tagging:** django-taggit + select2.js
+- **Icons:** SVG Icons for categories
 
 ## 📦 Installation
 
-```bash
-git clone https://github.com/your-username/your-repo.git
-cd your-repo
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/sumia-ecommerce.git
+   cd sumia-ecommerce
+   ```
 
-python -m venv venv
-source venv/bin/activate  # or venv\Scripts\activate on Windows
+2. Create and activate a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # Windows: venv\Scripts\activate
+   ```
 
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py createsuperuser
-python manage.py runserver
-```
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-Visit: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+4. Apply migrations:
+   ```bash
+   python manage.py migrate
+   ```
 
-## 📜 Requirements
+5. Create superuser:
+   ```bash
+   python manage.py createsuperuser
+   ```
 
-Include the following in your `requirements.txt`:
+6. Run the server:
+   ```bash
+   python manage.py runserver
+   ```
 
-```
-Django>=4.2,<5.0
-pillow>=10.0.0
-django-jazzmin>=2.6.0
-django-widget-tweaks>=1.4.12
-django-taggit>=3.1.0
-django-select2>=8.0
-```
+## 📂 Requirements
 
-And add `jazzmin` to `INSTALLED_APPS` before `'django.contrib.admin'`:
+See the `requirements.txt` file, which includes:
 
-```python
-INSTALLED_APPS = [
-    'jazzmin',
-    'django.contrib.admin',
-    ...
-]
-```
+- Django
+- django-taggit
+- django-select2
+- django-jazzmin
+- pillow
 
-## 🧑‍💻 Team
+## 👨‍👩‍👧‍👦 Team Collaboration
 
-- **David Ibitokun** — Developer  
-- **ChatGPT** — Documentation & Dev Support
+This project was a team effort involving:
 
-## 📸 Screenshots
+- **Backend Logic & Database Modeling**
+- **Vendor Dashboard & Tagging System**
+- **SVG Icon Management & UI Styling**
+- **Category Navigation & Subcategory Hover UI**
+- **Autocomplete API for Tags**
+- **Documentation & Deployment Setup**
 
-_Add screenshots of the home page, product card, cart page, and admin dashboard here._
+## 📑 Documentation
 
-## 📝 License
+The full project documentation is available in `sumia_project_documentation.docx`.
 
-MIT License
+## 📨 Contact
+
+If you have questions or want to contribute:
+
+📧 support@sumia.com  
+🌐 [Your GitHub Profile](https://github.com/yourusername)
+
+---
+
+🛍️ Happy Shopping with Sumia!
