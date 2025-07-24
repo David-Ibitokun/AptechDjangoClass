@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     home, about, shop, singleProduct, myAccount, page404,
-    login, register, myProfile, page500, page503,
+    login, register, page500, page503,
     add_product, product_list, product_detail, edit_product, delete_product,
     brand_detail, brand_list,
     remove_from_cart, add_to_cart, cart, view_cart, update_cart_quantity,
@@ -21,9 +21,6 @@ urlpatterns = [
     path('shop/', shop, name='shop'),
     path('myAccount/', myAccount, name='myAccount'),
     path('page404/', page404, name='page404'),
-    path('login/', login, name='login'),
-    path('register/', register, name='register'),
-    path('myProfile/', myProfile, name='myProfile'),
     path('page500/', page500, name='page500'),
     path('page503/', page503, name='page503'),
 

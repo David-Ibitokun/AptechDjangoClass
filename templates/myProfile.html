@@ -6,61 +6,48 @@
 {% block content %}
 <section class="py-5 bg-light">
     <div class="container">
+        <!-- Page Header -->
         <div class="text-center mb-5">
-            <h2 class="fw-bold text-primary display-5 mb-3">My Profile</h2>
-            <p class="lead text-muted">Manage your personal details and security settings.</p>
+            <h2 class="fw-bold text-primary display-5 mb-2">My Profile</h2>
+            <p class="lead text-muted">Manage your personal information and account settings</p>
         </div>
 
+        <!-- Profile Card -->
         <div class="row justify-content-center">
-            <div class="col-lg-8 col-md-10">
-                <div class="card shadow-lg border-0 rounded-4 p-4">
-                    <div class="card-body">
-                        <h4 class="card-title fw-bold mb-4">Personal Information</h4>
-                        <form method="post">
-                            {% csrf_token %}
-                            {# Assuming you have a form for profile updates, otherwise display static info #}
-                            {# Example: If using a Django form #}
-                            {# {{ form.as_p }} #}
+            <div class="col-lg-10">
+                <div class="card border-0 shadow-lg rounded-4 p-4 bg-white">
+                    <div class="row align-items-center">
+                        <!-- Left: Avatar & Username -->
+                        <div class="col-md-4 text-center border-end">
+                            <img src="{% static 'images/default-avatar.png' %}" class="img-fluid rounded-circle mb-3" alt="User Avatar" width="120" height="120">
+                            <h4 class="fw-semibold text-primary">{{ user.username }}</h4>
+                            <p class="text-muted mb-0">Account Owner</p>
+                        </div>
 
-                            {# Static display for now, replace with form fields if you have a profile update form #}
-                            <div class="mb-3">
-                                <label for="username" class="form-label">Username</label>
-                                <input type="text" class="form-control rounded-pill" id="username" value="{{ user.username }}" readonly>
-                            </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email Address</label>
-                                <input type="email" class="form-control rounded-pill" id="email" value="{{ user.email }}" readonly>
-                            </div>
-                            {# Add more profile fields as needed, e.g., first_name, last_name #}
-                            <div class="mb-4">
-                                <label for="first_name" class="form-label">First Name</label>
-                                <input type="text" class="form-control rounded-pill" id="first_name" value="{{ user.first_name|default:'' }}" readonly>
-                            </div>
-                             <div class="mb-4">
-                                <label for="last_name" class="form-label">Last Name</label>
-                                <input type="text" class="form-control rounded-pill" id="last_name" value="{{ user.last_name|default:'' }}" readonly>
-                            </div>
+                        <!-- Right: Details -->
+                        <div class="col-md-8">
+                            <h5 class="mb-4 fw-bold text-dark">Personal Information</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item bg-transparent">
+                                    <strong>Email:</strong> {{ user.email }}
+                                </li>
+                                <li class="list-group-item bg-transparent">
+                                    <strong>First Name:</strong> {{ user.first_name|default:"-" }}
+                                </li>
+                                <li class="list-group-item bg-transparent">
+                                    <strong>Last Name:</strong> {{ user.last_name|default:"-" }}
+                                </li>
+                                <!-- Add more fields here if needed -->
+                            </ul>
 
-                            {# You can add a button to enable editing, or a link to an edit profile page #}
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm" disabled>
-                                    Update Profile (Functionality to be added)
-                                </button>
-                                <a href="{% url 'user_dashboard' %}" class="btn btn-outline-secondary btn-lg rounded-pill">
+                            <!-- Action Buttons -->
+                            <div class="mt-4 d-flex justify-content-between">
+                                <a href="{% url 'user_dashboard' %}" class="btn btn-outline-secondary btn-lg rounded-pill px-4">
                                     Back to Dashboard
                                 </a>
                             </div>
-                        </form>
-
-                        <hr class="my-5">
-
-                        <h4 class="card-title fw-bold mb-4">Password Settings</h4>
-                        <p class="text-muted">Change your password to keep your account secure.</p>
-                        {# Link to a password change page if you have one #}
-                        <a href="#" class="btn btn-outline-dark rounded-pill px-4" disabled>
-                            Change Password (Functionality to be added)
-                        </a>
-                    </div>
+                        </div>
+                    </div> <!-- end row -->
                 </div>
             </div>
         </div>

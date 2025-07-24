@@ -193,33 +193,6 @@ def register(request):
     top_level_categories = Category.objects.filter(parent__isnull=True).order_by('name')
     return render(request, 'register.html', {'top_level_categories': top_level_categories})
 
-@login_required(login_url='login')
-def myProfile(request):
-    """
-    Handles displaying and updating the user's profile information.
-    """
-    if request.method == 'POST':
-        from .forms import UserProfileForm # Import here to avoid circular dependency
-        form = UserProfileForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Your profile was successfully updated!')
-            return redirect('myProfile') # Redirect to the same page to show updated info
-        else:
-            messages.error(request, 'Please correct the error below.')
-    else:
-        from .forms import UserProfileForm # Import here
-        form = UserProfileForm(instance=request.user)
-    
-    # Get top-level categories for the base template's navigation
-    top_level_categories = Category.objects.filter(parent__isnull=True).order_by('name')
-
-    context = {
-        'form': form,
-        'top_level_categories': top_level_categories, # Pass for base.html
-    }
-    return render(request, 'myProfile.html', context)
-
 # NEW: Password Change Done View (simple redirect or render success message)
 @login_required(login_url='login')
 def password_change_done(request):
