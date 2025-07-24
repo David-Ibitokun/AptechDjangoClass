@@ -240,7 +240,6 @@
                         {% if request.user.is_authenticated %}
                         <li class="nav-item active"><a  class="nav-link" href="{% if request.user.account_type == 'user' %}{% url 'user_dashboard' %}{% elif request.user.account_type == 'vendor' %}{% url 'vendor_dashboard' %}{% else %}{% url 'login' %}{% endif %}" class="dropdown-item">My Account</a></li>
                         <li class="nav-item active"><a  class="nav-link" href="{% url 'cart' %}" class="dropdown-item">Cart</a></li>
-                        <li class="nav-item active"><a  class="nav-link" href="{% url 'checkout' %}" class="dropdown-item">Checkout</a></li>
                         <li class="nav-item active"><a  class="nav-link" href="{% url 'wishlist' %}" class="dropdown-item">Wishlist</a></li>
                         <li class="nav-item active"><a  class="nav-link" href="{% url 'logout' %}" class="dropdown-item">Logout</a></li>
                         {% else %}
