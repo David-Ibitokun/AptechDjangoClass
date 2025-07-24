@@ -261,6 +261,7 @@ class Order(models.Model):
     city = models.CharField(max_length=100, blank=True, null=True)
     zip_code = models.CharField(max_length=20, blank=True, null=True)
     country = models.CharField(max_length=100, blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
     
     # Payment Method
     payment_method = models.CharField(max_length=50, choices=PAYMENT_METHOD_CHOICES, default='COD')

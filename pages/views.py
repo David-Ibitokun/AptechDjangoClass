@@ -286,8 +286,27 @@ def order_detail(request, order_number): # Changed parameter name to order_numbe
     }
     return render(request, 'order_detail.html', context)
 
+
 @login_required(login_url='login')
-def user_dashboard(request):
+def users_order_detail(request, order_number):
+    """
+    Displays the details of a specific order for the logged-in user.
+    """
+    # Ensures the order belongs to the logged-in user for security
+    order = get_object_or_404(Order, order_number=order_number, user=request.user)
+    
+    order_items = OrderItem.objects.filter(order=order).select_related('product')
+    
+    top_level_categories = Category.objects.filter(parent__isnull=True).order_by('name')
+    context = {
+        'order': order,
+        'order_items': order_items,
+        'top_level_categories': top_level_categories,
+    }
+    return render(request, 'users_order_detail.html', context)
+
+@login_required(login_url='login')
+def user_dashboard(request, order_number):
     """
     Renders the user dashboard page.
     """
@@ -318,23 +337,28 @@ def vendor_orders(request):
     """
     Displays a list of orders that contain products created by the logged-in vendor.
     """
-    # Annotate each Order with the sum of prices of items belonging to this vendor
-    # This ensures 'vendor_total_amount' is available for each order object
-    vendor_orders_list = Order.objects.filter(orderitem__product__creator=request.user).distinct().annotate(
-        vendor_total_amount=Sum(
-            F('orderitem__quantity') * F('orderitem__price_at_purchase'),
-            filter=Q(orderitem__product__creator=request.user) # Filter sum to only include vendor's items
-        )
-    ).order_by('-created_at')
+    # Get all OrderItems where the product's creator is the current user
+    # Use select_related to optimize fetching related Order and Product objects
+    # Also select_related('user') to get customer details efficiently
+    vendor_orders_list = Order.objects.filter(orderitem__product__creator=request.user)\
+                                      .distinct()\
+                                      .select_related('user')\
+                                      .annotate(
+                                          vendor_total_amount=Sum(
+                                              F('orderitem__quantity') * F('orderitem__price_at_purchase'),
+                                              filter=Q(orderitem__product__creator=request.user)
+                                          )
+                                      ).order_by('-created_at')
 
     # Get top-level categories for the base template's navigation
     top_level_categories = Category.objects.filter(parent__isnull=True).order_by('name')
 
     context = {
         'orders': vendor_orders_list,
-        'top_level_categories': top_level_categories, # Pass for base.html
+        'top_level_categories': top_level_categories,
     }
     return render(request, 'vendor_orders.html', context)
+
 
 
 @login_required(login_url='login')
@@ -682,6 +706,7 @@ def checkout(request):
         city = request.POST.get('city')
         zip_code = request.POST.get('zip_code')
         country = request.POST.get('country')
+        phone_number = request.POST.get('phone_number')
         payment_method = request.POST.get('payment_method')
 
         if not all([address, city, country, payment_method]):
@@ -693,6 +718,7 @@ def checkout(request):
                 'top_level_categories': top_level_categories,
                 # Pass back submitted data to pre-fill form if validation fails
                 'address': address, 'city': city, 'zip_code': zip_code, 'country': country,
+                'phone_number': phone_number,
                 'payment_method': payment_method,
             }
             return render(request, 'checkout.html', context)
@@ -714,6 +740,7 @@ def checkout(request):
                 address=address,
                 city=city,
                 zip_code=zip_code,
+                phone_number = phone_number,
                 country=country,
                 payment_method=payment_method,
             )
@@ -751,6 +778,7 @@ def checkout(request):
                 'top_level_categories': top_level_categories,
                 # Pass back submitted data to pre-fill form
                 'address': address, 'city': city, 'zip_code': zip_code, 'country': country,
+                'phone_number' : phone_number,
                 'payment_method': payment_method,
             }
             return render(request, 'checkout.html', context)
@@ -766,6 +794,7 @@ def checkout(request):
             'city': user.city if hasattr(user, 'city') else '',
             'zip_code': user.zip_code if hasattr(user, 'zip_code') else '',
             'country': user.country if hasattr(user, 'country') else '',
+            'phone_number': user.phone_number if hasattr(user, 'phone_number') else '',
             'payment_method': 'COD', # Default selected payment method
         }
         return render(request, 'checkout.html', context)

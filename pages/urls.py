@@ -12,7 +12,7 @@ from .views import (
     category_detail,
     contact,
     recent_order, order_detail,
-    user_dashboard,
+    user_dashboard, users_order_detail,
 )
 
 urlpatterns = [
@@ -59,7 +59,7 @@ urlpatterns = [
     path('contact/', contact, name='contact'),
 
     path('my-orders/', recent_order, name='recent_order'),
-    path('my-orders/<str:order_number>/', order_detail, name='order_detail'), # User specific order detail
-
+    path('my-orders/<str:order_number>/', users_order_detail, name='users_order_detail'), 
+    
     path('user-dashboard/', user_dashboard, name='user_dashboard'), # User dashboard page
 ]
