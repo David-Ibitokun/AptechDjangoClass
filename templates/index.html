@@ -1,224 +1,131 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load humanize %} {# For intcomma filter #}
+{% load humanize %}
 
 {% block title %}Home - Sumia{% endblock %}
 
 {% block content %}
 
+<!-- Hero Section -->
 <section class="hero-section py-5 text-center bg-primary text-white rounded-bottom-4 shadow-lg mb-5">
-    <div class="container">
-        <h1 class="display-3 fw-bold mb-3 animate__animated animate__fadeInDown text-muted">Welcome to Sumia</h1>
-        <p class="lead mb-4 animate__animated animate__fadeInUp">Shop the latest trends. Fast delivery. Secure checkout.</p>
-        
-    </div>
+  <div class="container">
+    <h1 class="display-3 fw-bold mb-3 animate__animated animate__fadeInDown text-light">Welcome to Sumia</h1>
+    <p class="lead mb-4 animate__animated animate__fadeInUp">Shop the latest trends. Fast delivery. Secure checkout.</p>
+  </div>
 </section>
 
-<section class="container-fluid my-5 d-flex flex-column flex-lg-row">
-    {# Category Sidebar #}
-    <div class="category-sidebar me-lg-4 mb-4 mb-lg-0 p-4 bg-white rounded-4 shadow-sm" style="flex-shrink: 0; width: 100%; max-width: 300px;">
+<!-- Main Content: Sidebar + Products -->
+<div class="container mb-5">
+  <div class="row">
+    <!-- Sidebar -->
+    <aside class="col-lg-3 mb-4">
+      <div class="bg-white p-4 rounded-4 shadow-sm">
         <h3 class="text-primary fw-bold mb-4 text-center">Categories</h3>
 
         {% if form.category.errors %}
-            <div class="alert alert-danger small mb-3 rounded-3">{{ form.category.errors }}</div>
+          <div class="alert alert-danger small mb-3 rounded-3">{{ form.category.errors }}</div>
         {% endif %}
 
-    <div class="accordion" id="categoryAccordion">
-      {% for parent_category in top_level_categories %}
-        {% if parent_category.slug %} {# Add this check to prevent errors if slug is missing #}
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="heading-{{ parent_category.slug }}">
-              <a href="{% url 'category_detail' parent_category.slug %}" class="" style="
-                  position: relative;
-                  display: flex;
-                  align-items: center;
-                  width: inherit;
-                  padding: var(--bs-accordion-btn-padding-y) var(--bs-accordion-btn-padding-x);
-                  font-size: 1rem;
-                  color: var(--bs-accordion-btn-color);
-                  text-align: left;
-                  background-color: var(--bs-accordion-btn-bg);
-                  border: 0;
-                  cursor: pointer;
-                  border-radius: 0;
-                  overflow-anchor: none;
-                  transition: var(--bs-accordion-transition);
-                  border-top-left-radius: var(--bs-accordion-inner-border-radius);
-                  border-top-right-radius: var(--bs-accordion-inner-border-radius);
-                  font-weight: 700;
-                  margin: 0;
-                  font-family: inherit;
-                  line-height: inherit;
-                  text-decoration: none; /* Ensure link style is clean */
-                ">
-                {% if parent_category.icon %}
-                  <i class="{{ parent_category.icon }}" style="margin-right: 1rem;"></i>
+        <div class="accordion" id="categoryAccordion">
+          {% for parent_category in top_level_categories %}
+            {% if parent_category.slug %}
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="heading-{{ parent_category.slug }}">
+                  <a href="{% url 'category_detail' parent_category.slug %}" style="font-size: large;" class="accordion-button collapsed d-block text-decoration-none text-dark fw-bold px-3 py-2 rounded">
+                    {% if parent_category.icon %}
+                      <i class="{{ parent_category.icon }} me-2"></i>
+                    {% endif %}
+                    {{ parent_category.name }}
+                  </a>
+                </h2>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </aside>
+
+    <!-- Featured Products -->
+    <div class="col-lg-9">
+      <h2 class="text-center text-primary fw-bold mb-4">Featured Products</h2>
+
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+        {% for product in products %}
+          <div class="col">
+            <div class="card h-100 shadow-sm border-0 rounded-4">
+              <a href="{% url 'product_detail' product.slug %}" class="text-decoration-none">
+                {% if product.image %}
+                  <img src="{{ product.image.url }}" class="card-img-top rounded-top-4" alt="{{ product.name }}" style="height: 180px; object-fit: cover;">
+                {% else %}
+                  <img src="https://placehold.co/400x180/cccccc/333333?text=No+Image" class="card-img-top rounded-top-4" alt="No Image" style="height: 180px; object-fit: cover;">
                 {% endif %}
-                {{ parent_category.name }}
               </a>
-            </h2>
-          </div>
-        {% endif %} {# End of parent_category.slug check #}
-      {% endfor %}
-    </div>
-    </div>
-
-
-    <div class="flex-grow-1">
-        <section class="products">
-            <h2 class="text-center text-primary fw-bold mb-4">Featured Products</h2>
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-                {% for product in products %}
-                <div class="col">
-                    <div class="card h-100 shadow-sm border-0 rounded-4">
-                        <a href="{% url 'product_detail' product.slug %}" class="text-decoration-none"> {# Corrected to product.slug #}
-                            {% if product.image %}
-                                <img src="{{ product.image.url }}" class="card-img-top rounded-top-4" alt="{{ product.name }}" style="height: 180px; object-fit: cover;">
-                            {% else %}
-                                <img src="https://placehold.co/400x180/cccccc/333333?text=No+Image" class="card-img-top rounded-top-4" alt="No Image" style="height: 180px; object-fit: cover;">
-                            {% endif %}
-                        </a>
-                        <div class="card-body d-flex flex-column p-3">
-                            <h5 class="card-title fw-bold text-truncate mb-2">
-                                <a href="{% url 'product_detail' product.slug %}" class="text-decoration-none text-dark">{{ product.name }}</a> {# Corrected to product.slug #}
-                            </h5>
-                            {% if product.brand %}
-                                <p class="card-text text-muted small mb-1">Brand: {{ product.brand.name }}</p>
-                            {% endif %}
-                            <div class="mb-2">
-                                {% if product.discount_price %}
-                                    <span class="text-danger fw-bold fs-5">₦{{ product.discount_price|intcomma }}</span>
-                                    <span class="text-muted text-decoration-line-through ms-2">₦{{ product.price|intcomma }}</span>
-                                    <span class="badge bg-danger ms-2">{{ product.get_discount_percent }}% OFF</span>
-                                {% else %}
-                                    <span class="text-primary fw-bold fs-5">₦{{ product.price|intcomma }}</span>
-                                {% endif %}
-                            </div>
-                            <div class="mt-auto d-flex justify-content-between align-items-center">
-                                {% if product.is_available and product.stock_quantity > 0 %}
-                                    <form action="{% url 'add_to_cart' product.id %}" method="post" class="d-inline">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="quantity" value="1">
-                                        <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3">
-                                            <i class="fas fa-shopping-cart me-1"></i> Add to Cart
-                                        </button>
-                                    </form>
-                                    <a href="{% url 'add_to_wishlist' product.id %}" class="btn btn-outline-danger btn-sm rounded-pill" title="Add to Wishlist">
-                                        <i class="far fa-heart"></i>
-                                    </a>
-                                {% else %}
-                                    <span class="badge bg-danger px-3 py-2 rounded-pill">Out of Stock</span>
-                                    <a href="{% url 'add_to_wishlist' product.id %}" class="btn btn-outline-danger btn-sm rounded-pill disabled" title="Add to Wishlist">
-                                        <i class="far fa-heart"></i>
-                                    </a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
+              <div class="card-body d-flex flex-column p-3">
+                <h5 class="card-title fw-bold text-truncate mb-2">
+                  <a href="{% url 'product_detail' product.slug %}" class="text-decoration-none text-dark">{{ product.name }}</a>
+                </h5>
+                {% if product.brand %}
+                  <p class="card-text text-muted small mb-1">Brand: {{ product.brand.name }}</p>
+                {% endif %}
+                <div class="mb-2">
+                  {% if product.discount_price %}
+                    <span class="text-danger fw-bold fs-5">₦{{ product.discount_price|intcomma }}</span>
+                    <span class="text-muted text-decoration-line-through ms-2">₦{{ product.price|intcomma }}</span>
+                    <span class="badge bg-danger ms-2">{{ product.get_discount_percent }}% OFF</span>
+                  {% else %}
+                    <span class="text-primary fw-bold fs-5">₦{{ product.price|intcomma }}</span>
+                  {% endif %}
                 </div>
-                {% empty %}
-                <div class="col-12">
-                    <div class="alert alert-info text-center py-4 my-4 rounded-3 shadow-sm" role="alert">
-                        <h4 class="alert-heading"><i class="fas fa-info-circle me-2"></i> No Featured Products!</h4>
-                        <p>It looks like there are no products to feature right now.</p>
-                        <hr>
-                        <p class="mb-0">Check back later or explore our full <a href="{% url 'shop' %}" class="alert-link">shop</a>.</p>
-                    </div>
+                <div class="mt-auto d-flex justify-content-between align-items-center">
+                  {% if product.is_available and product.stock_quantity > 0 %}
+                    <form action="{% url 'add_to_cart' product.id %}" method="post" class="d-inline">
+                      {% csrf_token %}
+                      <input type="hidden" name="quantity" value="1">
+                      <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3">
+                        <i class="fas fa-shopping-cart me-1"></i> Add to Cart
+                      </button>
+                    </form>
+                    <a href="{% url 'add_to_wishlist' product.id %}" class="btn btn-outline-danger btn-sm rounded-pill" title="Add to Wishlist">
+                      <i class="far fa-heart"></i>
+                    </a>
+                  {% else %}
+                    <span class="badge bg-danger px-3 py-2 rounded-pill">Out of Stock</span>
+                    <a href="{% url 'add_to_wishlist' product.id %}" class="btn btn-outline-danger btn-sm rounded-pill disabled" title="Add to Wishlist">
+                      <i class="far fa-heart"></i>
+                    </a>
+                  {% endif %}
                 </div>
-                {% endfor %}
+              </div>
             </div>
-        </section>
+          </div>
+        {% empty %}
+          <div class="col-12">
+            <div class="alert alert-info text-center py-4 my-4 rounded-3 shadow-sm" role="alert">
+              <h4 class="alert-heading"><i class="fas fa-info-circle me-2"></i> No Featured Products!</h4>
+              <p>It looks like there are no products to feature right now.</p>
+              <hr>
+              <p class="mb-0">Check back later or explore our full <a href="{% url 'shop' %}" class="alert-link">shop</a>.</p>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
     </div>
-</section>
+  </div>
+</div>
 
+<!-- Optional Custom Styling -->
 <style>
-    /* Hero Section Specific Styles */
-    .hero-section {
-        background: linear-gradient(45deg, #ffc43f, #ffc235); /* Gradient background */
-        color: white;
-        padding: 80px 0;
-        border-radius: 0 0 2rem 2rem; /* Rounded bottom corners */
-    }
-    .hero-section h1 {
-        font-size: 3.5rem;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-    }
-    .hero-section .lead {
-        font-size: 1.25rem;
-    }
-
-    /* Category Sidebar Specific Styles */
-    .category-sidebar {
-        min-width: 250px; /* Adjusted min-width */
-        border-right: 1px solid #eee; /* Subtle separator */
-    }
-    .category-sidebar .accordion-button {
-        background-color: #f8f9fa; /* Light background for accordion buttons */
-        border: none;
-        border-radius: .5rem;
-        margin-bottom: .25rem;
-        transition: background-color 0.2s ease-in-out;
-        color: #343a40;
-        font-weight: bold;
-        padding: 1rem 1.25rem;
-        display: flex;
-        align-items: center;
-    }
-    .category-sidebar .accordion-button:hover {
-        background-color: #e9ecef;
-    }
-    .category-sidebar .accordion-button:not(.collapsed) {
-        background-color: #e2e6ea;
-        color: #0d6efd;
-    }
-    .category-sidebar .accordion-button:not(.collapsed) i {
-        color: #0d6efd;
-    }
-    .category-sidebar .accordion-button a {
-        color: inherit; /* Inherit color from button */
-    }
-    .category-sidebar .accordion-body {
-        background-color: #ffffff;
-        border-top: 1px solid #eee;
-        padding: 0; /* Remove default padding for list-group */
-    }
-    .category-sidebar .list-group-item {
-        background-color: #ffffff;
-        border-left: 3px solid transparent;
-        transition: border-left-color 0.2s ease-in-out;
-    }
-    .category-sidebar .list-group-item:hover {
-        background-color: #f0f2f5;
-        border-left-color: #0d6efd;
-    }
-    .category-sidebar .list-group-item a {
-        color: #495057;
-        font-weight: 500;
-    }
-    .category-sidebar .list-group-item a:hover {
-        color: #0d6efd;
-    }
-
-    /* Product Card Specific Styles (Consistent with other pages) */
-    .product-card {
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    }
-    .product-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-    }
-    .product-card .card-img-top {
-        border-top-left-radius: calc(0.5rem - 1px);
-        border-top-right-radius: calc(0.5rem - 1px);
-    }
-    .product-card .card-body {
-        padding: 1rem;
-    }
-    .product-card .card-title {
-        font-size: 1.15rem;
-    }
-    .product-card .badge {
-        font-size: 0.8em;
-    }
+  .hero-section {
+    background: linear-gradient(45deg, #ffc43f, #ffc235);
+    padding: 80px 0;
+    border-radius: 0 0 2rem 2rem;
+  }
+  .accordion-button {
+    background-color: #f8f9fa;
+  }
+  .accordion-button:hover {
+    background-color: #e9ecef;
+  }
 </style>
+
 {% endblock %}
