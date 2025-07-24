@@ -41,7 +41,7 @@ The homepage includes:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/sumia-ecommerce.git
+   git clone https://github.com/David-Ibitokun/AptechDjangoClass
    cd sumia-ecommerce
    ```
 
@@ -95,13 +95,6 @@ This project was a team effort involving:
 ## 📑 Documentation
 
 The full project documentation is available in `sumia_project_documentation.docx`.
-
-## 📨 Contact
-
-If you have questions or want to contribute:
-
-📧 support@sumia.com  
-🌐 [Your GitHub Profile](https://github.com/yourusername)
 
 ---
 
