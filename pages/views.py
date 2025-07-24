@@ -2103,10 +2103,8 @@ def vendor_order_detail(request, order_number): # Changed parameter name to orde
     }
     return render(request, 'order_detail.html', context)
 
-
-@login_required(login_url='login')
 def product_detail(request, slug):
-    product = get_object_or_404(Product, slug=slug)
+    product = get_object_or_404(Product, slug=slug) # No is_available filter here, useful for vendor to see all
     category = product.category
 
     # Build breadcrumb list (from root to current)
@@ -2119,11 +2117,20 @@ def product_detail(request, slug):
     # Get top-level categories for the base template's navigation
     top_level_categories = Category.objects.filter(parent__isnull=True).order_by('name')
 
-    return render(request, 'product_detail.html', {
+    # --- Start: Logic for "You might also like" products ---
+    related_products = Product.objects.filter(
+        category=product.category, # Same category
+        is_available=True # Only show available products
+    ).exclude(pk=product.pk).order_by('?')[:4] # Exclude current product, get 4 random
+    # --- End: Logic for "You might also like" products ---
+
+    context = {
         'product': product,
         'breadcrumb': breadcrumb,
         'top_level_categories': top_level_categories, # Pass for base.html
-    })
+        'products': related_products, # <-- NEW: Pass related products for "You might also like" section
+    }
+    return render(request, 'product_detail.html', context)
 
 
 def generate_unique_slug(name):
