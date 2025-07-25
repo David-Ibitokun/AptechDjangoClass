@@ -103,3 +103,30 @@ def vendor_dashboard(request):
 
     products = Product.objects.filter(creator=request.user)
     return render(request, 'vendor_dashboard.html', {'products': products})
+
+@login_required(login_url='login')
+def myProfile(request):
+    """
+    Handles displaying and updating the user's profile information.
+    """
+    if request.method == 'POST':
+        from ..authentications.forms import UsersRegistrationForm # Import here to avoid circular dependency
+        form = UsersRegistrationForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your profile was successfully updated!')
+            return redirect('myProfile') # Redirect to the same page to show updated info
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        from .forms import UsersRegistrationForm # Import here
+        form = UsersRegistrationForm(instance=request.user)
+    # from pages.views import Category
+    # Get top-level categories for the base template's navigation
+    # top_level_categories = Category.objects.filter(parent__isnull=True).order_by('name')
+
+    context = {
+        'form': form,
+        # 'top_level_categories': top_level_categories, # Pass for base.html
+    }
+    return render(request, 'myProfile.html', context)
