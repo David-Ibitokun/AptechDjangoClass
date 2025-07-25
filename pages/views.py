@@ -25,7 +25,7 @@ def home(request):
     """
     Renders the homepage with latest products and parent categories.
     """
-    products = Product.objects.filter(is_available=True).order_by('-created_at')[:8]
+    products = Product.objects.filter(is_available=True).order_by('-created_at')[:12]
     parent_categories = Category.objects.filter(parent__isnull=True)
 
     # Get top-level categories for the base template's navigation

@@ -50,11 +50,11 @@
                                     {% endif %}
                                     <p class="card-text mb-2">
                                         {% if product.discount_price %}
-                                            <span class="text fw-bold fs-5" style="color: red;">${{ product.discount_price|floatformat:2 }}</span>
-                                            <span class="text-muted text-decoration-line-through ms-2">${{ product.price|floatformat:2 }}</span>
+                                            <span class="text fw-bold fs-5" style="color: red;">₦{{ product.discount_price|floatformat:2|intcomma }}</span>
+                                            <span class="text-muted text-decoration-line-through ms-2">₦{{ product.price|floatformat:2|intcomma }}</span>
                                             <span class="badge bg-success ms-2">{{ product.get_discount_percent }}% OFF</span>
                                         {% else %}
-                                            <span class="text-primary fw-bold fs-5">${{ product.price|floatformat:2 }}</span>
+                                            <span class="text-primary fw-bold fs-5">₦{{ product.price|floatformat:2|intcomma }}</span>
                                         {% endif %}
                                     </p>
                                     <div class="mt-auto d-flex justify-content-between align-items-center">
