@@ -107,199 +107,155 @@
   </div>
 
 
-<header class="sticky-top bg-white">
-  <div class="container-fluid">
-    <div class="row py-3 border-bottom">
+<header class="sticky-top bg-white shadow-sm border-bottom">
+  <div class="container-fluid py-2">
+    <div class="row align-items-center g-3">
 
-      <div class="col-sm-4 col-lg-3 text-center text-sm-start">
-        <div class="main-logo">
-          <a href="{% url 'home' %}">
-            <img src="{% static 'images/sumia.png' %}" style="width: 100px; height: 85px;" alt="logo" class="img-fluid">
-          </a>
-        </div>
+      <div class="col-auto">
+        <a href="{% url 'home' %}">
+          <img src="{% static 'images/sumia.png' %}" alt="Sumia Logo" class="img-fluid" style="height: 60px;">
+        </a>
       </div>
 
-      {# The search bar visible only on large and larger screens (d-lg-block) #}
-      <div class="col-sm-6 offset-sm-2 offset-md-0 col-lg-5 d-none d-lg-block"> {# Changed d-md-block back to d-lg-block #}
-        <form class="row bg-light p-2 my-2 rounded-4 align-items-center" action="{% url 'search' %}" method="GET">
-          <div class="col-md-5 d-none d-md-block">
-            <select name="category" class="form-select border-0 bg-transparent">
-              <option value="">All Categories</option>
-              {% for parent in top_level_categories %}
+      <div class="col d-none d-lg-block">
+        <form class="d-flex align-items-center bg-light rounded-pill px-3" action="{% url 'search' %}" method="GET">
+          <select name="category" class="form-select border-0 bg-transparent w-auto me-2">
+            <option value="">All Categories</option>
+            {% for parent in top_level_categories %}
               <option value="{{ parent.id }}" {% if request.GET.category|add:'' == parent.id|add:'' %}selected{% endif %}>
-                {% if parent.icon %}<i class="{{ parent.icon }}"></i>{% endif %} {{ parent.name }}
+                {{ parent.name }}
               </option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="col-11 col-md-6">
-            <input type="text" name="q" class="form-control border-0 bg-transparent" placeholder="Search for products"
-              aria-label="Search" value="{{ request.GET.q|default:'' }}" />
-          </div>
-          <div class="col-1 text-end">
-            <button type="submit" class="btn p-0 border-0 bg-transparent search-button">
-              <svg width="24" height="24" viewBox="0 0 24 24">
-                <use xlink:href="#search"></use>
-              </svg>
-            </button>
-          </div>
+            {% endfor %}
+          </select>
+          <input type="text" name="q" class="form-control border-0 bg-transparent"
+                     placeholder="Search for products..." value="{{ request.GET.q|default:'' }}">
+          <button type="submit" class="btn border-0 bg-transparent text-primary">
+            <svg width="24" height="24"><use xlink:href="#search"></use></svg>
+          </button>
         </form>
       </div>
 
-      <div
-        class="col-sm-8 col-lg-4 d-flex justify-content-end gap-3 align-items-center mt-4 mt-sm-0 justify-content-center justify-content-sm-end">
+      <div class="col-auto ms-auto d-flex align-items-center gap-3">
 
-        {# Search Icon for Medium and Smaller Screens (d-md-block for display, d-lg-none for hiding on large) #}
-        <div class="d-md-block d-lg-none"> {# Visible from md breakpoint down to extra small #}
-          <button class="btn p-0 border-0 bg-transparent" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSearch" aria-controls="offcanvasSearch">
-            <svg width="24" height="24" viewBox="0 0 24 24">
-              <use xlink:href="#search"></use>
-            </svg>
-          </button>
+        <button class="btn p-0 border-0 bg-transparent d-lg-none" type="button"
+                     data-bs-toggle="offcanvas" data-bs-target="#offcanvasSearch">
+          <svg width="24" height="24"><use xlink:href="#search"></use></svg>
+        </button>
+
+        <div class="d-none d-xl-block text-end small">
+          <div class="text-muted">Need Help?</div>
+          <div class="fw-bold">+980-34984089</div>
         </div>
 
-        <div class="support-box text-end d-none d-xl-block">
-          <span class="fs-6 text-muted">For Support?</span>
-          <h5 class="mb-0">+980-34984089</h5>
-        </div>
-
-        <ul class="d-flex justify-content-end list-unstyled m-0 gap-3">
-          {# My Account Icon #}
+        <ul class="list-unstyled d-flex m-0 gap-2 align-items-center">
           <li>
-            {% if user.is_authenticated %}
-            <a href="{% if user.account_type == 'user' %}{% url 'user_dashboard' %}{% elif user.account_type == 'vendor' %}{% url 'vendor_dashboard' %}{% else %}{% url 'login' %}{% endif %}"
-              class="rounded-circle bg-light p-2 mx-1 d-flex align-items-center justify-content-center">
-              <svg width="24" height="24" viewBox="0 0 24 24">
-                <use xlink:href="#user"></use>
-              </svg>
-            </a>
-            {% else %}
-            <a href="{% url 'login' %}"
-              class="rounded-circle bg-light p-2 mx-1 d-flex align-items-center justify-content-center">
-              <svg width="24" height="24" viewBox="0 0 24 24">
-                <use xlink:href="#user"></use>
-              </svg>
-            </a>
-            {% endif %}
-          </li>
-
-          {# Wishlist Icon #}
-          <li>
-            <a href="{% url 'wishlist' %}"
-              class="rounded-circle bg-light p-2 mx-1 d-flex align-items-center justify-content-center">
-              <svg width="24" height="24" viewBox="0 0 24 24">
-                <use xlink:href="#heart"></use>
-              </svg>
+            <a href="{% if user.is_authenticated %}
+                         {% if user.account_type == 'user' %}{% url 'user_dashboard' %}
+                         {% elif user.account_type == 'vendor' %}{% url 'vendor_dashboard' %}
+                         {% else %}{% url 'login' %}{% endif %}
+                       {% else %}
+                         {% url 'login' %}
+                       {% endif %}"
+               class="icon-btn">
+              <svg width="24" height="24"><use xlink:href="#user"></use></svg>
             </a>
           </li>
 
-          {# Cart Icon #}
-          <li>
-            <a href="{% url 'cart' %}"
-              class="rounded-circle bg-light p-2 mx-1 d-flex align-items-center justify-content-center"
-              >
-              <svg width="24" height="24" viewBox="0 0 24 24">
-                <use xlink:href="#cart"></use>
-              </svg>
-            </a>
-          </li>
+          <li><a href="{% url 'wishlist' %}" class="icon-btn"><svg width="24" height="24"><use xlink:href="#heart"></use></svg></a></li>
 
-          {# NEW: Logout Button #}
+          <li><a href="{% url 'cart' %}" class="icon-btn"><svg width="24" height="24"><use xlink:href="#cart"></use></svg></a></li>
+
           {% if user.is_authenticated %}
-          <li>
-            <a href="{% url 'logout' %}"
-              class="rounded-circle bg-light p-2 mx-1 d-flex align-items-center justify-content-center"
-              title="Logout">
-              <svg width="24" height="24" viewBox="0 0 24 24">
-                <use xlink:href="#box-arrow-right"></use>
-              </svg>
-            </a>
-          </li>
+          <li><a href="{% url 'logout' %}" class="icon-btn" title="Logout"><svg width="24" height="24"><use xlink:href="#box-arrow-right"></use></svg></a></li>
           {% endif %}
-          {# END NEW: Logout Button #}
-
         </ul>
       </div>
-
     </div>
   </div>
-  <div class="container-fluid">
-    <div class="row py-3">
-      <div class="d-flex justify-content-center justify-content-sm-between align-items-center"  style="margin: auto; justify-content: center; align-items: center; width: fit-content;">
-<nav class="main-menu navbar navbar-expand-lg"> {# Add bg-light or other background classes #}
-    <div> {# Use container-fluid or container for width control #}
 
-        <div class="collapse navbar-collapse justify-content-end" id="mainNavbarContent"> {# Added id for toggler target #}
-             <ul class="navbar-nav menu-list list-unstyled gap-3 mb-0"> {# Removed d-flex as collapse handles it, added gap #}
-                <li class="nav-item active">
-                    <a href="{% url 'home' %}" class="nav-link">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a href="{% url 'about' %}" class="nav-link">About Us</a>
-                </li>
-                        {% if request.user.is_authenticated %}
-                        <li class="nav-item active"><a  class="nav-link" href="{% if request.user.account_type == 'user' %}{% url 'user_dashboard' %}{% elif request.user.account_type == 'vendor' %}{% url 'vendor_dashboard' %}{% else %}{% url 'login' %}{% endif %}" class="dropdown-item">My Account</a></li>
-                        <li class="nav-item active"><a  class="nav-link" href="{% url 'cart' %}" class="dropdown-item">Cart</a></li>
-                        <li class="nav-item active"><a  class="nav-link" href="{% url 'wishlist' %}" class="dropdown-item">Wishlist</a></li>
-                        <li class="nav-item active"><a  class="nav-link" href="{% url 'logout' %}" class="dropdown-item">Logout</a></li>
-                        {% else %}
-                        <li class="nav-item active"><a  class="nav-link" href="{% url 'login' %}" class="dropdown-item">Login</a></li>
-                        <li class="nav-item active"><a  class="nav-link" href="{% url 'register' %}" class="dropdown-item">Register</a></li>
-                        {% endif %}
-                  
-            </ul>
+  <nav class="bg-light border-top">
+    <div class="container">
+      <div class="navbar navbar-expand-lg navbar-light">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-center" id="mainNavbar">
+          <ul class="navbar-nav mb-2 mb-lg-0">
+            <li class="nav-item"><a href="{% url 'home' %}" class="nav-link">Home</a></li>
+            <li class="nav-item"><a href="{% url 'about' %}" class="nav-link">About Us</a></li>
+            {% if request.user.is_authenticated %}
+              <li class="nav-item"><a href="{% if request.user.account_type == 'user' %}{% url 'user_dashboard' %}
+                                             {% elif request.user.account_type == 'vendor' %}{% url 'vendor_dashboard' %}
+                                             {% else %}{% url 'login' %}{% endif %}" class="nav-link">My Account</a></li>
+              <li class="nav-item"><a href="{% url 'cart' %}" class="nav-link">Cart</a></li>
+              <li class="nav-item"><a href="{% url 'wishlist' %}" class="nav-link">Wishlist</a></li>
+              <li class="nav-item"><a href="{% url 'logout' %}" class="nav-link text-danger">Logout</a></li>
+            {% else %}
+              <li class="nav-item"><a href="{% url 'login' %}" class="nav-link">Login</a></li>
+              <li class="nav-item"><a href="{% url 'register' %}" class="nav-link">Register</a></li>
+            {% endif %}
+          </ul>
         </div>
-    </div>
-</nav>
       </div>
     </div>
-  </div>
+  </nav>
 
   {% if messages %}
-  <div class="container mt-3">
-    {% for message in messages %}
-    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-      {{ message }}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="container mt-3">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
     </div>
-    {% endfor %}
-  </div>
   {% endif %}
-
 </header>
 
-{# Offcanvas Search Bar for Medium and Smaller Screens #}
-<div class="offcanvas offcanvas-top" tabindex="-1" id="offcanvasSearch" aria-labelledby="offcanvasSearchLabel">
+
+<!-- Mobile Search Offcanvas -->
+<div class="offcanvas offcanvas-top" id="offcanvasSearch">
   <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="offcanvasSearchLabel">Search Products</h5>
-    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    <h5>Search Products</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
   </div>
   <div class="offcanvas-body">
-    <form class="row bg-light p-2 my-2 rounded-4 align-items-center" action="{% url 'search' %}" method="GET">
-      <div class="col-12 mb-3">
-        <select name="category" class="form-select border-0 bg-transparent">
-          <option value="">All Categories</option>
-          {% for parent in top_level_categories %}
+    <form class="d-flex flex-column gap-2" action="{% url 'search' %}" method="GET">
+      <select name="category" class="form-select">
+        <option value="">All Categories</option>
+        {% for parent in top_level_categories %}
           <option value="{{ parent.id }}" {% if request.GET.category|add:'' == parent.id|add:'' %}selected{% endif %}>
-            {% if parent.icon %}<i class="{{ parent.icon }}"></i>{% endif %} {{ parent.name }}
+            {{ parent.name }}
           </option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-10">
-        <input type="text" name="q" class="form-control border-0 bg-transparent" placeholder="Search for products"
-          aria-label="Search" value="{{ request.GET.q|default:'' }}" />
-      </div>
-      <div class="col-2 text-end">
-        <button type="submit" class="btn p-0 border-0 bg-transparent search-button">
-          <svg width="24" height="24" viewBox="0 0 24 24">
-            <use xlink:href="#search"></use>
-          </svg>
+        {% endfor %}
+      </select>
+      <div class="input-group">
+        <input type="text" name="q" class="form-control" placeholder="Search for products"
+               value="{{ request.GET.q|default:'' }}">
+        <button type="submit" class="btn btn-primary">
+          <svg width="20" height="20"><use xlink:href="#search"></use></svg>
         </button>
       </div>
     </form>
   </div>
 </div>
+
+<!-- Extra CSS for Icons -->
+<style>
+  .icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    transition: background 0.2s;
+  }
+  .icon-btn:hover {
+    background: #e9ecef;
+  }
+</style>
 
   {% block content %}
 
