@@ -1,10 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 
-from .forms import UsersRegistrationForm # Import your custom registration form
+from .forms import UsersRegistrationForm, CustomAuthenticationForm
 # Assuming 'pages' is another app and Product is defined there
 from pages.models import Product # Ensure this import path is correct for your project structure
 
@@ -24,7 +23,9 @@ def register_user(request):
             messages.success(request, "Registration successful. You can now log in.")
             return redirect('login') # Redirect to the login page
         else:
-            messages.error(request, "Please correct the errors below.")
+            messages.error(request, "Registration failed. Please correct the errors below.")
+            print(form.errors) # For debugging purposes
+
     else:
         form = UsersRegistrationForm()
 
@@ -44,7 +45,7 @@ def login_user(request):
             return redirect('user_dashboard')
 
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
+        form = CustomAuthenticationForm(request, data=request.POST)
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
@@ -65,7 +66,7 @@ def login_user(request):
             # This message is shown if the form itself is not valid (e.g., empty fields)
             messages.error(request, "Please enter your username and password.")
     else:
-        form = AuthenticationForm()
+        form = CustomAuthenticationForm()
 
     return render(request, 'login.html', {'form': form})
 

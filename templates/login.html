@@ -3,45 +3,125 @@
 {% load static %}
 
 {% block content %}
-<section class="py-5 bg-light">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-md-6 col-lg-5">
-        <div class="card shadow-lg border-0 rounded-4">
-          <div class="card-body p-5">
-            <h3 class="text-center mb-4 text-primary fw-bold">Login to Your Account</h3>
+<link rel="stylesheet" href="{% static 'authentications/css/auth-styles.css' %}">
 
-            {% if messages %}
-              {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-              {% endfor %}
-            {% endif %}
+<section class="auth-container">
+  <div class="auth-card">
+    <div class="auth-card-body">
+      <!-- Header -->
+      <div class="auth-header">
+        <h3 class="auth-title">Welcome Back</h3>
+        <p class="auth-subtitle">Sign in to your account to continue</p>
+      </div>
 
-            <form method="POST" novalidate>
-              {% csrf_token %}
-              <div class="mb-3">
-                <label class="form-label fw-semibold">{{ form.username.label }}</label>
-                {{ form.username }}
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label fw-semibold">{{ form.password.label }}</label>
-                {{ form.password }}
-              </div>
-
-              <div class="d-grid">
-                <button type="submit" class="btn btn-primary py-2 fs-5 rounded-pill">Login</button>
-              </div>
-            </form>
-
-            <p class="text-center mt-4 text-muted">
-              Don't have an account?
-              <a href="{% url 'register' %}" class="text-decoration-none">Register here</a>
-            </p>
+      <!-- Messages -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-custom alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            <i class="fas fa-{% if message.tags == 'error' %}exclamation-circle{% elif message.tags == 'success' %}check-circle{% elif message.tags == 'warning' %}warning{% else %}info-circle{% endif %}"></i>
+            <div class="flex-grow-1">
+              {{ message }}
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- Form -->
+      <form method="POST" class="auth-form" novalidate>
+        {% csrf_token %}
+
+        <!-- Username Field -->
+        <div class="form-group-custom">
+          <label for="{{ form.username.id_for_label }}" class="form-label-custom">
+            <i class="fas fa-user"></i> Username
+          </label>
+          <div class="input-group-custom">
+            {{ form.username }}
+            <i class="fas fa-user input-group-text-custom"></i>
+          </div>
+          {% if form.username.errors %}
+            {% for error in form.username.errors %}
+              <div class="error-feedback-custom">
+                <i class="fas fa-times-circle"></i> {{ error }}
+              </div>
+            {% endfor %}
+          {% endif %}
         </div>
+
+        <!-- Password Field -->
+        <div class="form-group-custom mt-3">
+          <label for="{{ form.password.id_for_label }}" class="form-label-custom">
+            <i class="fas fa-lock"></i> Password
+          </label>
+          <div class="input-group-custom" style="position: relative;">
+            {{ form.password }}
+            <i class="fas fa-lock input-group-text-custom"></i>
+            <button type="button" class="btn-password-toggle" id="toggle-id_password" title="Toggle password visibility">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+          {% if form.password.errors %}
+            {% for error in form.password.errors %}
+              <div class="error-feedback-custom">
+                <i class="fas fa-times-circle"></i> {{ error }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-auth btn-primary-auth mt-5">
+          <i class="fas fa-sign-in-alt"></i> Login
+        </button>
+      </form>
+
+      <!-- Footer Links -->
+      <div class="auth-footer">
+        <p class="auth-footer-text">
+          Don't have an account?
+          <a href="{% url 'register' %}" class="auth-footer-link">
+            Sign Up Here
+          </a>
+        </p>
       </div>
     </div>
   </div>
 </section>
+
+<script>
+  // Fade out Django messages after 5 seconds
+  document.addEventListener('DOMContentLoaded', () => {
+    const alerts = document.querySelectorAll('.alert-custom');
+    alerts.forEach(alert => {
+      setTimeout(() => {
+        alert.style.animation = 'fadeOut 0.5s ease-out forwards';
+        setTimeout(() => alert.remove(), 500);
+      }, 5000);
+    });
+
+    // Password toggle functionality
+    const passwordToggle = document.getElementById('toggle-id_password');
+    if (passwordToggle) {
+      passwordToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        const passwordField = document.getElementById('id_password');
+        const icon = this.querySelector('i');
+
+        if (passwordField.type === 'password') {
+          passwordField.type = 'text';
+          icon.classList.remove('fa-eye');
+          icon.classList.add('fa-eye-slash');
+          this.title = 'Hide password';
+        } else {
+          passwordField.type = 'password';
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+          this.title = 'Show password';
+        }
+      });
+    }
+  });
+</script>
+
 {% endblock %}

@@ -1,103 +1,264 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load widget_tweaks %}
 
 {% block content %}
-<section class="py-5 bg-light">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-md-7 col-lg-6">
-        <div class="card shadow-lg border-0 rounded-4">
-          <div class="card-body p-5">
-            <h3 class="card-title text-center mb-4 text-primary fw-bold">Create Your Account</h3>
+<link rel="stylesheet" href="{% static 'authentications/css/auth-styles.css' %}">
 
-            {% if messages %}
-              <div class="mb-3">
-              {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                  {{ message }}
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+<section class="auth-container">
+  <div class="auth-card">
+    <div class="auth-card-body">
+      <!-- Header -->
+      <div class="auth-header">
+        <h3 class="auth-title">Create Account</h3>
+        <p class="auth-subtitle">Join us and start your journey today</p>
+      </div>
+
+      <!-- Messages -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-custom alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            <i class="fas fa-{% if message.tags == 'error' %}exclamation-circle{% elif message.tags == 'success' %}check-circle{% elif message.tags == 'warning' %}warning{% else %}info-circle{% endif %}"></i>
+            <div class="flex-grow-1">
+              {{ message }}
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- Form Errors -->
+      {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+          <div class="alert alert-custom alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i>
+            <div class="flex-grow-1">
+              {{ error }}
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="POST" class="auth-form" novalidate>
+        {% csrf_token %}
+
+        <!-- Row 1: First Name & Last Name -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <!-- First Name -->
+          <div class="form-group-custom">
+            <label for="{{ form.first_name.id_for_label }}" class="form-label-custom">
+              <i class="fas fa-user"></i> First Name
+            </label>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}
+              {% for error in form.first_name.errors %}
+                <div class="error-feedback-custom">
+                  <i class="fas fa-times-circle"></i> {{ error }}
                 </div>
               {% endfor %}
-              </div>
             {% endif %}
+          </div>
 
-            {% if form.non_field_errors %}
-              <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
-                {% for error in form.non_field_errors %}
-                  <div>{{ error }}</div>
-                {% endfor %}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-              </div>
-            {% endif %}
-
-            <form method="POST" novalidate>
-              {% csrf_token %}
-
-              {% for field in form %}
-                {% if field.name == 'agreed_to_terms' %}
-                  <div class="form-check mb-4">
-                    {{ field }} {# This renders the checkbox input #}
-                    <label class="form-check-label" for="{{ field.id_for_label }}">
-                      {{ field.label }}
-                    </label>
-                    {% if field.help_text %}
-                      <div class="form-text text-muted">{{ field.help_text }}</div>
-                    {% endif %}
-                    {% if field.errors %}
-                      <div class="invalid-feedback d-block">
-                        {% for error in field.errors %}
-                          {{ error }}
-                        {% endfor %}
-                      </div>
-                    {% endif %}
-                  </div>
-                {% else %}
-                  <div class="mb-3">
-                    <label for="{{ field.id_for_label }}" class="form-label fw-semibold">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.help_text %}
-                      <div class="form-text text-muted">{{ field.help_text }}</div>
-                    {% endif %}
-                    {% if field.errors %}
-                      <div class="invalid-feedback d-block">
-                        {% for error in field.errors %}
-                          {{ error }}
-                        {% endfor %}
-                      </div>
-                    {% endif %}
-                  </div>
-                {% endif %}
+          <!-- Last Name -->
+          <div class="form-group-custom">
+            <label for="{{ form.last_name.id_for_label }}" class="form-label-custom">
+              <i class="fas fa-user"></i> Last Name
+            </label>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}
+              {% for error in form.last_name.errors %}
+                <div class="error-feedback-custom">
+                  <i class="fas fa-times-circle"></i> {{ error }}
+                </div>
               {% endfor %}
-
-              <div class="d-grid">
-                <button type="submit" class="btn btn-primary py-2 fs-5 rounded-pill shadow-sm">
-                  Register
-                </button>
-              </div>
-            </form>
-
-            <p class="text-center mt-4 mb-0 text-muted">
-              Already have an account?
-              <a href="{% url 'login' %}" class="text-decoration-none fw-medium">Login here</a>
-            </p>
+            {% endif %}
           </div>
         </div>
+
+        <!-- Row 2: Username & Email -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+          <!-- Username -->
+          <div class="form-group-custom">
+            <label for="{{ form.username.id_for_label }}" class="form-label-custom">
+              <i class="fas fa-at"></i> Username
+            </label>
+            <div class="input-group-custom">
+              {{ form.username }}
+              <i class="fas fa-at input-group-text-custom"></i>
+            </div>
+            {% if form.username.errors %}
+              {% for error in form.username.errors %}
+                <div class="error-feedback-custom">
+                  <i class="fas fa-times-circle"></i> {{ error }}
+                </div>
+              {% endfor %}
+            {% endif %}
+          </div>
+
+          <!-- Email -->
+          <div class="form-group-custom">
+            <label for="{{ form.email.id_for_label }}" class="form-label-custom">
+              <i class="fas fa-envelope"></i> Email Address
+            </label>
+            <div class="input-group-custom">
+              {{ form.email }}
+              <i class="fas fa-envelope input-group-text-custom"></i>
+            </div>
+            {% if form.email.errors %}
+              {% for error in form.email.errors %}
+                <div class="error-feedback-custom">
+                  <i class="fas fa-times-circle"></i> {{ error }}
+                </div>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Row 3: Password & Confirm Password -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+          <!-- Password 1 -->
+          <div class="form-group-custom">
+            <label for="{{ form.password1.id_for_label }}" class="form-label-custom">
+              <i class="fas fa-lock"></i> Password
+            </label>
+            <div class="input-group-custom" style="position:relative;">
+              <span class="input-group-text-custom"><i class="fas fa-lock"></i></span>
+              {{ form.password1|add_class:'form-control-custom' }}
+              <button type="button" class="btn-password-toggle" id="toggle-id_password1" title="Toggle password visibility" tabindex="-1">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            {% if form.password1.errors %}
+              {% for error in form.password1.errors %}
+                <div class="error-feedback-custom">
+                  <i class="fas fa-times-circle"></i> {{ error }}
+                </div>
+              {% endfor %}
+            {% endif %}
+          </div>
+
+          <!-- Password 2 -->
+          <div class="form-group-custom">
+            <label for="{{ form.password2.id_for_label }}" class="form-label-custom">
+              <i class="fas fa-lock"></i> Confirm Password
+            </label>
+            <div class="input-group-custom" style="position:relative;">
+              <span class="input-group-text-custom"><i class="fas fa-lock"></i></span>
+              {{ form.password2|add_class:'form-control-custom' }}
+              <button type="button" class="btn-password-toggle" id="toggle-id_password2" title="Toggle password visibility" tabindex="-1">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            {% if form.password2.errors %}
+              {% for error in form.password2.errors %}
+                <div class="error-feedback-custom">
+                  <i class="fas fa-times-circle"></i> {{ error }}
+                </div>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Account Type -->
+        <div class="form-group-custom" style="margin-top: 15px;">
+          <label class="form-label-custom">
+            <i class="fas fa-briefcase"></i> Account Type
+          </label>
+          <div class="radio-group-custom">
+            {% for radio in form.account_type %}
+              <label class="radio-label-custom">
+                {{ radio.tag }} <span>{{ radio.choice_label }}</span>
+              </label>
+            {% endfor %}
+          </div>
+          {% if form.account_type.errors %}
+            {% for error in form.account_type.errors %}
+              <div class="error-feedback-custom">
+                <i class="fas fa-times-circle"></i> {{ error }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+
+        <!-- Terms & Conditions -->
+        <div class="checkbox-custom">
+          {{ form.agreed_to_terms }}
+          <label for="{{ form.agreed_to_terms.id_for_label }}">
+            I agree to the <strong>Terms and Conditions</strong>
+          </label>
+          {% if form.agreed_to_terms.errors %}
+            {% for error in form.agreed_to_terms.errors %}
+              <div class="error-feedback-custom" style="width: 100;">
+                <i class="fas fa-times-circle"></i> {{ error }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-auth btn-primary-auth mt-3">
+          <i class="fas fa-user-plus"></i> Create Account
+        </button>
+      </form>
+
+      <!-- Footer Links -->
+      <div class="auth-footer">
+        <p class="auth-footer-text">
+          Already have an account?
+          <a href="{% url 'login' %}" class="auth-footer-link">
+            Sign In
+          </a>
+        </p>
       </div>
     </div>
   </div>
 </section>
 
+<style>
+  /* Responsive grid for register form */
+  @media (max-width: 576px) {
+    div[style*="grid-template-columns"] {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
+
 <script>
   // Fade out Django messages after 5 seconds
   document.addEventListener('DOMContentLoaded', () => {
-    const alerts = document.querySelectorAll('.alert');
+    const alerts = document.querySelectorAll('.alert-custom');
     alerts.forEach(alert => {
       setTimeout(() => {
-        alert.classList.remove('show');
-        alert.classList.add('fade');
-        // Optionally remove the alert from the DOM after fading out
-        alert.addEventListener('transitionend', () => alert.remove());
+        alert.style.animation = 'fadeOut 0.5s ease-out forwards';
+        setTimeout(() => alert.remove(), 500);
       }, 5000);
+    });
+
+    // Password toggle functionality
+    const passwordToggleButtons = ['toggle-id_password1', 'toggle-id_password2'];
+    passwordToggleButtons.forEach(buttonId => {
+      const button = document.getElementById(buttonId);
+      if (button) {
+        button.addEventListener('click', function(e) {
+          e.preventDefault();
+          const fieldId = this.id.replace('toggle-', '');
+          const passwordField = document.getElementById(fieldId);
+          const icon = this.querySelector('i');
+
+          if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+            this.title = 'Hide password';
+          } else {
+            passwordField.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+            this.title = 'Show password';
+          }
+        });
+      }
     });
   });
 </script>

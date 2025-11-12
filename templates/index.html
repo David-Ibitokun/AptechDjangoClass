@@ -16,16 +16,15 @@
 
 <!-- Main Content: Sidebar + Products -->
 <div class="container mb-5">
-  <div class="row">
+  <div class="row g-4">
     <!-- Sidebar -->
-    <aside class="col-lg-3 mb-4">
-      <div class="bg-white p-4 rounded-4 shadow-sm">
+    <aside class="col-lg-3">
+      <!-- Categories for desktop -->
+      <div class="d-none d-lg-block bg-white p-4 rounded-4 shadow-sm">
         <h3 class="text-primary fw-bold mb-4 text-center">Categories</h3>
-
         {% if form.category.errors %}
           <div class="alert alert-danger small mb-3 rounded-3">{{ form.category.errors }}</div>
         {% endif %}
-
         <div class="accordion" id="categoryAccordion">
           {% for parent_category in top_level_categories %}
             {% if parent_category.slug %}
@@ -41,6 +40,39 @@
               </div>
             {% endif %}
           {% endfor %}
+        </div>
+      </div>
+
+      <!-- Button to trigger offcanvas sidebar on smaller screens -->
+      <div class="d-lg-none" style="position: fixed; top: 140px; right: 15px; z-index: 1040;">
+        <button class="btn btn-primary btn-lg shadow" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCategories" aria-controls="offcanvasCategories">
+          <i class="fas fa-list-ul"></i>
+        </button>
+      </div>
+
+      <!-- Offcanvas Sidebar for smaller screens -->
+      <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasCategories" aria-labelledby="offcanvasCategoriesLabel">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasCategoriesLabel">Categories</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <div class="accordion" id="categoryAccordionMobile">
+            {% for parent_category in top_level_categories %}
+              {% if parent_category.slug %}
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="heading-mobile-{{ parent_category.slug }}">
+                    <a href="{% url 'category_detail' parent_category.slug %}" style="font-size: large;" class="accordion-button collapsed d-block text-decoration-none text-dark fw-bold px-3 py-2 rounded">
+                      {% if parent_category.icon %}
+                        <i class="{{ parent_category.icon }} me-2"></i>
+                      {% endif %}
+                      {{ parent_category.name }}
+                    </a>
+                  </h2>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
         </div>
       </div>
     </aside>

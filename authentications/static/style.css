@@ -328,7 +328,7 @@ h1,h2,h3,h4,h5,h6 {
   content: "";
   width: 50px;
   height: 50px;
-  border: 5px solid #007bff;
+  border: 5px solid #FFC43F;
   border-top-color: transparent; /* Makes the top part transparent for the spin effect */
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -728,5 +728,31 @@ h1,h2,h3,h4,h5,h6 {
 @media screen and (min-width:1200px) {
   .product-thumbnail-slider {
     height: 740px;
+  }
+}
+
+/* Responsive adjustments for index.html content */
+@media (max-width: 991px) {
+  /* Adjustments for the sidebar on medium and small screens */
+  .hero-section {
+    padding: 40px 0; /* Reduce hero section padding on smaller screens */
+  }
+
+  aside.col-lg-3 {
+    margin-bottom: 20px; /* Reduce bottom margin for sidebar */
+  }
+
+  aside.col-lg-3 .bg-white {
+    padding: 20px; /* Reduce padding inside the sidebar container */
+  }
+
+  aside.col-lg-3 .accordion-button {
+    font-size: medium !important; /* Adjust font size for category buttons */
+    padding: 10px 15px; /* Adjust padding for category buttons */
+  }
+
+  /* Center the categories heading on smaller screens */
+  aside.col-lg-3 h3.text-center {
+    margin-bottom: 20px;
   }
 }
